@@ -1,15 +1,10 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +14,94 @@
   }
 }
 
+/* globals.css */
+@keyframes cosmicShift {
+  0%   { background-position:   0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position:   0% 50%; }
+}
+
+/* 2. The CSS class you’ll apply to your <h1> */
+.cosmic-gradient {
+  background: linear-gradient(
+    270deg,
+    #0d1b2a,  /* deep space navy */
+    #2c3e50,  /* twilight indigo */
+    #4b0082,  /* cosmic purple */
+    #1e213a,  /* mid-space blue */
+    #0d1b2a   /* back to navy for smooth loop */
+  );
+  background-size: 800% 800%;
+  animation: cosmicShift 10s ease infinite;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+}
+
+
+/* Radial Gradient Background */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: radial-gradient(circle at center, #0a0f2c, #0d1b2a, #000000);
+  color: white;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  overflow-x: hidden;
+  z-index: -5; /* Background is behind everything */
+  position: relative; /* Ensure z-index works */
+}
+
+/* Stars layer base styles */
+.stars, .stars2 {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100vw;      /* cover full viewport */
+  height: 100vh;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* First layer: bright, faster twinkle */
+.stars::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 2px; height: 2px;        /* one tiny dot */
+  border-radius: 50%;
+  background: white;
+  box-shadow:
+    50vw 20vh white,
+    80vw 40vh #aaa,
+    10vw 30vh white,
+    30vw 90vh #ccc,
+    70vw 70vh white,
+    60vw 10vh #ddd,
+    20vw 80vh white,
+    90vw 50vh #999;
+  animation: twinkle 4s infinite ease-in-out alternate;
+  opacity: 0.9;
+}
+
+/* Second layer: dimmer, slower twinkle */
+.stars2::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 2px; height: 2px;
+  border-radius: 50%;
+  background: white;
+  box-shadow:
+    25vw 10vh white,
+    60vw 80vh #aaa,
+    15vw 50vh white,
+    85vw 70vh #ccc;
+  animation: twinkle 6s infinite ease-in-out alternate;
+  opacity: 0.7;
+}
+
+/* Twinkle keyframes */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1;   }
 }
