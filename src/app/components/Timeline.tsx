@@ -53,7 +53,7 @@ const projects: ProjectEntry[] = [
   },
 ];
 
-function useInView(ref: React.RefObject<HTMLElement>, rootMargin = "0px") {
+function useInView(ref: React.RefObject<HTMLElement | null>, rootMargin = "0px") {
   const [inView, setInView] = useState(false);
   useEffect(() => {
     if (!ref.current) return;
