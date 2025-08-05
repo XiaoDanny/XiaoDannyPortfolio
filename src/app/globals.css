@@ -38,28 +38,54 @@
   -webkit-text-fill-color: transparent;
   
 }
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+.cursor {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  background-color: currentColor;
+  animation: blink 1s step-start infinite;
+}
 
 
-/* Radial Gradient Background */
+
+
 body {
-  background: radial-gradient(circle at center, #0a0f2c, #0d1b2a, #000000);
+  background: radial-gradient(
+    circle at center,
+    #111626 0%,     /* slightly darker than #121829 */
+    #0f1323 10%,
+    #0d111f 20%,
+    #0c101f 30%,    /* deep space blue, gently darkened */
+    #0b0f1c 45%,
+    #0a0d1a 60%,
+    #090b18 75%,
+    #080a14 90%,    /* dark navy, nudged down */
+    #000000 100%    /* pure black */
+  );
   color: white;
   margin: 0;
   padding: 0;
   font-family: sans-serif;
   overflow-x: hidden;
-  z-index: -5; /* Background is behind everything */
-  position: relative; /* Ensure z-index works */
+  z-index: -5;
+  position: relative;
 }
 
-/* Stars layer base styles */
-.stars, .stars2 {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100vw;      /* cover full viewport */
-  height: 100vh;
-  pointer-events: none;
-  will-change: transform;
+.cosmic-divider {
+  width: 100%;
+  height: 1px;                             /* thin line */
+  margin: 2rem 0;                          /* spacing above/below */
+  background: linear-gradient(
+    to right,
+    rgba(11, 15, 28, 0) 0%,                /* fully transparent at edges */
+    rgba(0, 255, 255, 0.3) 30%,            /* faint cyan glow */
+    rgba(139, 0, 255, 0.3) 70%,            /* faint purple glow */
+    rgba(11, 15, 28, 0) 100%               /* back to transparent */
+  );
 }
 
 /* First layer: bright, faster twinkle */
