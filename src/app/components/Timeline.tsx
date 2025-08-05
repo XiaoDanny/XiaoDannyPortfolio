@@ -33,7 +33,7 @@ const projects: ProjectEntry[] = [
     description:
     "Simulates a real-world e-commerce platform with user authentication, enabling users to search, browse, and securely check out movies.",
     date: "September–December 2024",
-    technologies: ["Java", "SQL", "Tomcat", "AWS", "Docker", "Kubernetes,", "jMeter"],
+    technologies: ["Java", "SQL", "Tomcat", "AWS", "Docker", "Kubernetes", "jMeter"],
   },
   {
     name: "Cooling Center Locator",
@@ -41,7 +41,7 @@ const projects: ProjectEntry[] = [
     description:
       "Locates nearby cooling centers based on the user’s location and provides helpful tips to stay cool during heatwaves.",
     date: "March-June 2024",
-    technologies: ["React", "HTML5 Geolocation", "CSS"],
+    technologies: ["JavaScript", "React", "GoogleMaps API"],
   },
   {
     name: "UCI Search Engine",
@@ -49,7 +49,7 @@ const projects: ProjectEntry[] = [
     description:
       "A web crawler and search system designed to extract and organize content from UCI’s official website.",
     date: "March-June 2023",
-    technologies: ["Java", "Spring Boot", "MySQL"],
+    technologies: ["React", "Node", "Python", "Flash", "OpenAI API"],
   },
 ];
 
@@ -87,8 +87,9 @@ export default function Timeline() {
 }
 
 function TimelineItem({ entry, side }: { entry: ProjectEntry; side: "left" | "right" }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const visible = useInView(ref, "-100px");
+    const ref = useRef<HTMLElement>(null);
+    const visible = useInView(ref, "-100px");
+
   const isLeft = side === "left";
 
   // container positioning
