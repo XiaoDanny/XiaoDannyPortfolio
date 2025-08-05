@@ -22,12 +22,12 @@ export default function Home() {
     {
       name: "DiveOutplay",
       title: "Dive Outplay",
-      story: "Drew enemy pressure and burned their time and resources, allowing my team to secure key objectives across the map in Game 4 of a high-stakes elimination BO5.",
+      story: "This match was the lower bracket finals to qualify for the North American Champions League(Professional League). On the verge of elimination, I outplayed the enemy by drawing their pressure, and burning their time and resources while even securing a kill. This allowed my team to secure key objectives across the map.",
     },
     {
       name: "GankOutplay",
       title: "Gank Outplay",
-      story: "Outplayed a collapse from the best mid/jungle in the tournament, turning pressure into a lead.",
+      story: "In a really tough series vs the tournament favorites in the upper bracket finals, I baited the enemy mid and jungle callapse and outplayed it to secure a kill and an early game lead",
     },
     {
       name: "GankOutplay2",
@@ -42,17 +42,17 @@ export default function Home() {
     {
       name: "Shockwave",
       title: "Shockwave",
-      story: "'XiaoDanny Shockwave will find them all!' A perfectly timed ultimate that secured victory for UCI Esports.",
+      story: "'XiaoDanny Shockwave will find them all!' With our backs against the wall, a perfectly timed ultimate secured victory for UCI Esports in a high-stakes elimination match.",
     },
     {
       name: "TeamfightWin",
       title: "Teamfight Win",
-      story: "Executed a clean teamfight against the tournament favorites to qualify for the North American Challengers League.",
+      story: "This teamfight was memorable for me because we fell really far behind against the tournament favorites. But with clean teamfight execution, we were able to turn the tide and secure a comeback victory.",
     },
     {
       name: "TeamfightWin2",
       title: "Teamfight Win 2",
-      story: "Clean team fight—securing a win against NAs #1 mid-lane prospect, Evolved, in a high-pressure game.",
+      story: "One of the most memorable teamfights for me. We competed in the North American Challengers League Open Qualifier and went up against NA’s #1 mid lane prospect, Evolved. With an amazing engage from our support, Kurulean, we clinch a vital series win to take us to the upper bracket finals.",
     },
   ];
 
@@ -377,14 +377,14 @@ export default function Home() {
     <li>Game: League of Legends</li>
     <li>Maintained Challenger (0.01% NA ranking) while balancing academics</li>
     <li>Primary shotcaller and leader on multiple semi-professional teams</li>
-    <li>Led multiple deep runs in high-stakes tournaments, securing key victories for my team</li>
+    <li>Led multiple deep runs in high-stakes tournaments</li>
   </ul>
 </div>
 
 <TypingText
   label="Fun Fact:"
   phrases={["I play midlane", "My current favorite champion is Taliyah", "My favorite pro-player is Zeka", "I beat T1 Faker in soloq", "I'm a Bjergsen fan", "I peaked 1100 LP in NA soloq", "My flash is on F", "I'm a RoseThorn fan", "I'm a Kurulean fan", "I'm a Strompest fan", "I'm a Gorica Fan", "I'm a Joey fan"]}
-  className="mt-6 -translate-x-0 -translate-y-5"
+  className="mt-6 -translate-x-0 -translate-y-2"
 />
 {/* Clip Details */}
 <div className="mt-4">
@@ -394,7 +394,7 @@ export default function Home() {
 {/* Clip Story */}
 <div
   className={`
-    mt-4 text-gray-300 transition-opacity duration-700
+    mt-4 text-gray-300 transition-opacity duration-700 -translate-y-2
     ${showVideoFade ? "opacity-100" : "opacity-0"}
   `}
   style={{ transitionDelay: "600ms", transitionDuration: "700ms" }}
@@ -418,7 +418,7 @@ export default function Home() {
           </section>
 
 {/* ── Experience & Projects Section ── */}
-<h2 className="text-3xl font-bold mb-4 text-center">About Me</h2>
+<h2 className="text-4xl font-bold mb-4 text-center">Experience</h2>
 
         <div className="max-w-6xl mx-auto px-6">
           <Timeline />
@@ -427,9 +427,13 @@ export default function Home() {
 
         </main>
     {/* Footer */}
-    <footer className="absolute bottom left text-gray-400 text-sm">
-      Developed and designed by <span className="text-white">Daniel Coyle</span>
-    </footer>
+    <footer className="absolute bottom-0 left-0 p-4 text-gray-400 text-sm translate-y-16">
+  Designed and Developed by <br />
+  <span className="text-white font-semibold">Daniel Coyle</span>
+</footer>
+
+
+
       </div>
     </div>
   );
