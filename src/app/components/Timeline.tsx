@@ -53,19 +53,24 @@ const projects: ProjectEntry[] = [
   },
 ];
 
-function useInView(ref: React.RefObject<HTMLElement | null>, rootMargin = "0px") {
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    if (!ref.current) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { rootMargin }
-    );
-    observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [ref, rootMargin]);
-  return inView;
-}
+function useInView(
+    ref: React.RefObject<HTMLDivElement | null>,
+    rootMargin = "0px"
+  ): boolean {
+    const [inView, setInView] = useState(false);
+  
+    useEffect(() => {
+      if (!ref.current) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => setInView(entry.isIntersecting),
+        { rootMargin }
+      );
+      observer.observe(ref.current);
+      return () => observer.disconnect();
+    }, [ref, rootMargin]);
+  
+    return inView;
+  }
 
 export default function Timeline() {
   return (
@@ -86,9 +91,17 @@ export default function Timeline() {
   );
 }
 
-function TimelineItem({ entry, side }: { entry: ProjectEntry; side: "left" | "right" }) {
-    const ref = useRef<HTMLElement>(null);
+function TimelineItem({
+    entry,
+    side,
+  }: {
+    entry: ProjectEntry;
+    side: "left" | "right";
+  }) {
+    // Now ref is HTMLDivElement | null and matches
+    const ref = useRef<HTMLDivElement>(null)
     const visible = useInView(ref, "-100px");
+
 
   const isLeft = side === "left";
 
