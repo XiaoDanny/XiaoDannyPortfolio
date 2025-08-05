@@ -42,7 +42,7 @@ export default function Home() {
     {
       name: "Shockwave",
       title: "Shockwave",
-      story: "&apos;XiaoDanny Shockwave will find them all!&apos; With our backs against the wall, a perfectly timed ultimate secured victory for UCI Esports in a high-stakes elimination match.",
+      story: "&#39;XiaoDanny Shockwave will find them all!&#39; With our backs against the wall, a perfectly timed ultimate secured victory for UCI Esports in a high-stakes elimination match.",
     },
     {
       name: "TeamfightWin",
@@ -155,7 +155,7 @@ export default function Home() {
           <nav className="max-w-7xl mx-auto flex justify-between items-center">
             <div className="text-lg font-bold" />
             <ul className="flex gap-6 text-sm sm:text-base">
-              {["home", "about", "experience", "projects"].map((id) => (
+              {["home", "about", "experience"].map((id) => (
                 <li key={id}>
                   <a
                     href={`#${id}`}
@@ -250,7 +250,7 @@ export default function Home() {
 
           {/* About Me / Highlights Section */}
           <section
-            id="about"
+          id = "about"
             className="py-0 flex flex-col items-start justify-start w-full max-w-6xl mx-auto px-6 relative transform -translate-y-20 -translate-x-28"
           >
             <h2 className="text-3xl font-bold mb-4 ">About Me</h2>
@@ -260,7 +260,7 @@ export default function Home() {
                 {/* Typing Text */}
                 <div className="-translate-x-5">
                   <TypingText
-                    label="I&apos;m Daniel Coyle, a"
+                    label="I&#39;m Daniel Coyle, a"
                     phrases={[
                       "Coder",
                       "Gamer",
@@ -288,7 +288,7 @@ export default function Home() {
                   impact.
                 </p>
                 <p className="mt-5 text-gray-300 max-w-xl">
-                  When I&apos;m not coding, you can find me gaming with friends,
+                  When I&#39;m not coding, you can find me gaming with friends,
                   working out, watching good movies/shows, or playing piano.
                 </p>
 
@@ -383,8 +383,21 @@ export default function Home() {
 
 <TypingText
   label="Fun Fact:"
-  phrases={["I play midlane", "My current favorite champion is Taliyah", "My favorite pro-player is Zeka", "I beat T1 Faker in soloq", "I&apos;m a Bjergsen fan", "I peaked 1100 LP in NA soloq", "My flash is on F", "I&apos;m a RoseThorn fan", "&apos;m a Kurulean fan", "I&apos;m a Strompest fan", "I&apos;m a Gorica Fan", "I&apos;m a Joey fan"]}
-  className="mt-6 -translate-x-0 -translate-y-2"
+  phrases={[
+    `I play midlane`,
+    `My current favorite champion is Taliyah`,
+    `My favorite pro-player is Zeka`,
+    `I beat T1 Faker in soloq`,
+    `I'm a Bjergsen fan`,
+    `I peaked 1100 LP in NA soloq`,
+    `My flash is on F`,
+    `I'm a RoseThorn fan`,
+    `I'm a Kurulean fan`,
+    `I'm a Strompest fan`,
+    `I'm a Gorica Fan`,
+    `I'm a Joey fan`
+  ]}
+    className="mt-6 -translate-x-0 -translate-y-2"
 />
 {/* Clip Details */}
 <div className="mt-4">
@@ -418,7 +431,7 @@ export default function Home() {
           </section>
 
 {/* ── Experience & Projects Section ── */}
-<h2 className="text-4xl font-bold mb-4 text-center">Experience</h2>
+<h2 id= "experience" className="text-4xl font-bold mb-4 text-center">Experience</h2>
 
         <div className="max-w-6xl mx-auto px-6">
           <Timeline />
