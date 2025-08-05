@@ -361,8 +361,8 @@ export default function Home() {
                                   ? "opacity-100"
                                   : "opacity-0"
                               }`}
-                  style={{ transitionDelay: "500ms" }}
-                  style={{ transitionDuration: "1700ms" }}
+                                style={{ transitionDelay: "500ms", transitionDuration: "1700ms" }}
+
                 >
                   <h3 className="text-2xl font-bold text-white mb-4">
                     {" "}
