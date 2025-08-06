@@ -292,9 +292,9 @@ export default function Home() {
                   </span>
                   . While at UCI, I competed as a{" "}
                   <span className="font-bold">
-                    semi-professional esports athlete and worked as a{" "}
+                    semi-professional esports athlete 
                   </span>
-                  
+                  {" "}and worked as a{" "}
                   <span className="font-bold">
                     student software developer
                   </span>
@@ -319,7 +319,10 @@ export default function Home() {
                   , apply my skills in real-world settings, and contribute to
                   meaningful, team-driven projects. I’m eager to continue
                   developing innovative software alongside talented engineers
-                  who share the same drive for impact.
+                  who share the same drive for {" "}<span className="font-bold">
+                  impact
+                  </span>
+                  .
                 </p>
                 <p className="mt-5 text-gray-300 max-w-xl">
                   When I&#39;m not coding, you can find me gaming with friends,
