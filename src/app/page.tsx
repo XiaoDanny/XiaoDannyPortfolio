@@ -22,44 +22,50 @@ export default function Home() {
     {
       name: "DiveOutplay",
       title: "Dive Outplay",
-      story: "This match was the lower bracket finals to qualify for the North American Champions League(Professional League). On the verge of elimination, I outplayed the enemy by drawing their pressure, and burning their time and resources while even securing a kill. This allowed my team to secure key objectives across the map.",
+      story:
+        "This match was the lower bracket finals to qualify for the North American Champions League(Professional League). On the verge of elimination, I outplayed the enemy by drawing their pressure, and burning their time and resources while even securing a kill. This allowed my team to secure key objectives across the map.",
     },
     {
       name: "GankOutplay",
       title: "Gank Outplay",
-      story: "In a really tough series vs the tournament favorites in the upper bracket finals, I baited the enemy mid and jungle callapse and outplayed it to secure a kill and an early game lead",
+      story:
+        "In a really tough series vs the tournament favorites in the upper bracket finals, I baited the enemy mid and jungle callapse and outplayed it to secure a kill and an early game lead",
     },
     {
       name: "GankOutplay2",
       title: "Gank Outplay 2",
-      story: "Survived and outplayed multiple members of the enemy team securing an early game lead for my team.",
+      story:
+        "Survived and outplayed multiple members of the enemy team securing an early game lead for my team.",
     },
     {
       name: "QuadraKill",
       title: "Quadra Kill",
-      story: "Secured a Quadra Kill in a crucial teamfight vs the tournament favorites in a high-stakes elimination match.",
+      story:
+        "Secured a Quadra Kill in a crucial teamfight vs the tournament favorites in a high-stakes elimination match.",
     },
     {
       name: "Shockwave",
       title: "Shockwave",
-      story: "&#39;XiaoDanny Shockwave will find them all!&#39; With our backs against the wall, a perfectly timed ultimate secured victory for UCI Esports in a high-stakes elimination match.",
+      story:
+        "&#39;XiaoDanny Shockwave will find them all!&#39; With our backs against the wall, a perfectly timed ultimate secured victory for UCI Esports in a high-stakes elimination match.",
     },
     {
       name: "TeamfightWin",
       title: "Teamfight Win",
-      story: "This teamfight was memorable for me because we fell really far behind against the tournament favorites. But with clean teamfight execution, we were able to turn the tide and secure a comeback victory.",
+      story:
+        "This teamfight was memorable for me because we fell really far behind against the tournament favorites. But with clean teamfight execution, we were able to turn the tide and secure a comeback victory.",
     },
     {
       name: "TeamfightWin2",
       title: "Teamfight Win 2",
-      story: "One of the most memorable teamfights for me. We competed in the North American Challengers League Open Qualifier and went up against NA’s #1 mid lane prospect, Evolved. With an amazing engage from our support, Kurulean, we clinch a vital series win to take us to the upper bracket finals.",
+      story:
+        "One of the most memorable teamfights for me. We competed in the North American Challengers League Open Qualifier and went up against NA’s #1 mid lane prospect, Evolved. With an amazing engage from our support, Kurulean, we clinch a vital series win to take us to the upper bracket finals.",
     },
   ];
 
   const currentClip = slideshowClips[currentIndex]; // Use the single declaration of currentIndex
 
   // Control playback and mute on state or clip change
-
 
   // Parallax effect for stars layers
   useEffect(() => {
@@ -121,24 +127,21 @@ export default function Home() {
     return () => vid.removeEventListener("volumechange", onVolChange);
   }, []);
 
-
-
-
-
   // Handlers
   const handleVideoEnded = () => {
     setCurrentIndex((prev) => (prev + 1) % slideshowClips.length);
   };
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? slideshowClips.length - 1 : prev - 1));
+    setCurrentIndex((prev) =>
+      prev === 0 ? slideshowClips.length - 1 : prev - 1,
+    );
   };
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % slideshowClips.length);
   };
 
-
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen">
       {/* Background gradient */}
       <div className="absolute inset-0 linear-gradient z-0" />
 
@@ -198,8 +201,8 @@ export default function Home() {
                   <span className="text-cyan-300 font-semibold drop-shadow-[0_0_6px_#00FFFF]">
                     building
                   </span>{" "}
-                  impactful web applications. I’m excited to share a bit about
-                  my journey and what drives me.
+                  impactful web applications. I’m excited to share
+                  my journey and what motivates me.
                 </p>
                 <div className="flex flex-col md:flex-row gap-4">
                   <a
@@ -250,7 +253,7 @@ export default function Home() {
 
           {/* About Me / Highlights Section */}
           <section
-          id = "about"
+            id="about"
             className="py-0 flex flex-col items-start justify-start w-full max-w-6xl mx-auto px-6 relative transform -translate-y-20 -translate-x-28"
           >
             <h2 className="text-3xl font-bold mb-4 ">About Me</h2>
@@ -273,39 +276,68 @@ export default function Home() {
                 </div>
                 {/* Paragraphs */}
                 <p className="mt-5 text-gray-300 max-w-xl">
-                  I recently graduated from UC Irvine with a B.S. in Computer
-                  Science. During my time as a student, I developed a strong
+                  I recently graduated from{" "}
+                  <span className="font-bold">
+                    UC Irvine
+                  </span>{" "}
+                  with a{" "}
+                  <span className="font-bold">
+                   Bachelor{"'"}s Degree in Computer Science
+                  </span>
+                  . During my time as a student, I developed a strong
                   passion for solving complex problems and building web
-                  applications that make a meaningful impact on people’s lives.
-                  While at UCI, I competed as a semi-professional esports
-                  athlete and worked as a student software developer—two roles
-                  where I led teams in high-stakes environments that demanded
-                  discpline, adaptability, and perserverence. These experiences
-                  helped me grow as a leader, apply my skills in real-world
-                  settings, and contribute to meaningful, team-driven projects.
-                  I’m now excited to continue developing innovative software
-                  alongside talented engineers who share the same drive for
-                  impact.
+                  applications that make a{" "}
+                  <span className="font-bold">
+                    meaningful impact on people’s lives
+                  </span>
+                  . While at UCI, I competed as a{" "}
+                  <span className="font-bold">
+                    semi-professional esports athlete and worked as a{" "}
+                  </span>
+                  
+                  <span className="font-bold">
+                    student software developer
+                  </span>
+                  —two roles where I{" "}
+                  led
+                  teams in high-stakes environments that demanded
+                  <span className="font-bold">
+                  {" "}discpline
+                  </span>
+                  ,{" "}
+                  <span className="font-bold">
+                    adaptability
+                  </span>
+                  , and{" "}
+                  <span className="font-bold">
+                    perserverence
+                  </span>
+                  . These experiences helped me grow as a{" "}
+                  <span className="font-bold">
+                    leader
+                  </span>
+                  , apply my skills in real-world settings, and contribute to
+                  meaningful, team-driven projects. I’m eager to continue
+                  developing innovative software alongside talented engineers
+                  who share the same drive for impact.
                 </p>
                 <p className="mt-5 text-gray-300 max-w-xl">
                   When I&#39;m not coding, you can find me gaming with friends,
                   working out, watching good movies/shows, or playing piano.
                 </p>
 
-{/* Explore My Competitive Journey */}
-<div className="text-center mt-8">
-  <button
-    onClick={() => {
-      setShowHighlights(true); // Show highlights on click
-      setShowJourneyText(false); // Hide the journey text
-    }}
-    className="text-4xl font-bold cosmic-gradient cursor-pointer hover:scale-105 transition-transform"
-  >
-    Explore My Competitive Journey
-  </button>
-</div>
-
-
+                {/* Explore My Competitive Journey */}
+                <div className="text-center mt-8">
+                  <button
+                    onClick={() => {
+                      setShowHighlights(true); // Show highlights on click
+                      setShowJourneyText(false); // Hide the journey text
+                    }}
+                    className="text-4xl font-bold cosmic-gradient cursor-pointer hover:scale-105 transition-transform"
+                  >
+                    Explore My Competitive Journey
+                  </button>
+                </div>
               </>
             ) : (
               <div className="w-full">
@@ -361,59 +393,72 @@ export default function Home() {
                                   ? "opacity-100"
                                   : "opacity-0"
                               }`}
-                                style={{ transitionDelay: "500ms", transitionDuration: "1700ms" }}
-
+                  style={{
+                    transitionDelay: "500ms",
+                    transitionDuration: "1700ms",
+                  }}
                 >
                   <h3 className="text-2xl font-bold text-white mb-4">
                     {" "}
                     <span className="text-cyan-300 font-semibold drop-shadow-[0_0_6px_#00FFFF]">
                       Notable Achievements
                     </span>{" "}
+                  </h3>
+                  <div>
+                    <ul className="list-disc list-inside text-gray-300 space-y-2">
+                      <li>IGN: XiaoDanny</li>
+                      <li>UCI Esports Scholarship Athlete 2021-2025</li>
+                      <li>Game: League of Legends</li>
+                      <li>
+                        Maintained Challenger (0.01% NA ranking) while balancing
+                        academics
+                      </li>
+                      <li>
+                        Primary shotcaller and leader on multiple
+                        semi-professional teams
+                      </li>
+                      <li>Led multiple deep runs in high-stakes tournaments</li>
+                    </ul>
+                  </div>
+
+                  <TypingText
+                    label="Fun Fact:"
+                    phrases={[
+                      `I play midlane`,
+                      `My current favorite champion is Taliyah`,
+                      `My favorite pro-player is Zeka`,
+                      `I beat T1 Faker in soloq`,
+                      `I'm a Bjergsen fan`,
+                      `I peaked 1100 LP in NA soloq`,
+                      `My flash is on F`,
+                      `I'm a RoseThorn fan`,
+                      `I'm a Kurulean fan`,
+                      `I'm a Strompest fan`,
+                      `I'm a Gorica Fan`,
+                      `I'm a Joey fan`,
+                    ]}
+                    className="mt-6 -translate-x-0 -translate-y-4"
+                  />
+                  {/* Clip Details */}
+                  <div className="mt-4">
+                    <h3 className="text-xl font-semibold text-white">
+                      Clip Context:
                     </h3>
-<div>
-  <ul className="list-disc list-inside text-gray-300 space-y-2">
-    <li>IGN: XiaoDanny</li>
-    <li>UCI Esports Scholarship Athlete 2021-2025</li>
-    <li>Game: League of Legends</li>
-    <li>Maintained Challenger (0.01% NA ranking) while balancing academics</li>
-    <li>Primary shotcaller and leader on multiple semi-professional teams</li>
-    <li>Led multiple deep runs in high-stakes tournaments</li>
-  </ul>
-</div>
+                  </div>
 
-<TypingText
-  label="Fun Fact:"
-  phrases={[
-    `I play midlane`,
-    `My current favorite champion is Taliyah`,
-    `My favorite pro-player is Zeka`,
-    `I beat T1 Faker in soloq`,
-    `I'm a Bjergsen fan`,
-    `I peaked 1100 LP in NA soloq`,
-    `My flash is on F`,
-    `I'm a RoseThorn fan`,
-    `I'm a Kurulean fan`,
-    `I'm a Strompest fan`,
-    `I'm a Gorica Fan`,
-    `I'm a Joey fan`
-  ]}
-    className="mt-6 -translate-x-0 -translate-y-2"
-/>
-{/* Clip Details */}
-<div className="mt-4">
-  <h3 className="text-xl font-semibold text-white">Clip Context:</h3>
-</div>
-
-{/* Clip Story */}
-<div
-  className={`
+                  {/* Clip Story */}
+                  <div
+                    className={`
     mt-4 text-gray-300 transition-opacity duration-700 -translate-y-2
     ${showVideoFade ? "opacity-100" : "opacity-0"}
   `}
-  style={{ transitionDelay: "600ms", transitionDuration: "700ms" }}
->
-  {currentClip.story}
-</div>
+                    style={{
+                      transitionDelay: "600ms",
+                      transitionDuration: "700ms",
+                    }}
+                  >
+                    {currentClip.story}
+                  </div>
 
                   {/* Back Button */}
                   <button
@@ -430,23 +475,20 @@ export default function Home() {
             )}
           </section>
 
-{/* ── Experience & Projects Section ── */}
-<h2 id= "experience" className="text-4xl font-bold mb-4 text-center">Experience</h2>
+          {/* ── Experience & Projects Section ── */}
+          <h2 id="experience" className="text-4xl font-bold mb-4 text-center">
+            Experience
+          </h2>
 
-        <div className="max-w-6xl mx-auto px-6">
-          <Timeline />
-        </div>
-
-
+          <div className="max-w-6xl mx-auto px-6">
+            <Timeline />
+          </div>
         </main>
-    {/* Footer */}
-    <footer className="absolute bottom-0 left-0 p-4 text-gray-400 text-sm translate-y-16">
-  Designed and Developed by <br />
-  <span className="text-white font-semibold">Daniel Coyle</span>
-</footer>
-
-
-
+        {/* Footer */}
+        <footer className="absolute bottom-0 left-0 p-4 text-gray-400 text-sm translate-y-16">
+          Designed and Developed by <br />
+          <span className="text-white font-semibold">Daniel Coyle</span>
+        </footer>
       </div>
     </div>
   );
