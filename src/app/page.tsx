@@ -206,7 +206,7 @@ export default function Home() {
                 </p>
                 <div className="flex flex-col md:flex-row gap-4">
                   <a
-                    href="/Images/Daniel_Coyle_Resume.pdf"
+                    href="/Daniel_Coyle_Resume.pdf"
                     download
                     className="hover:scale-110 transition-transform duration-200 bg-cyan-400 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 hover:shadow-[0_0_8px_rgb(14,188,212)] translate-x-5"
                   >
