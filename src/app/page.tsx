@@ -2,12 +2,14 @@
 import { useEffect, useRef, useState } from "react";
 import TypingText from "./components/TypingText";
 import Timeline from "./components/Timeline";
+
 export default function Home() {
   const starsRef = useRef<HTMLDivElement>(null);
   const stars2Ref = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  const [menuOpen, setMenuOpen] = useState(false);
   const [showJourneyText, setShowJourneyText] = useState(true);
   const [showVideo, setShowVideo] = useState(false);
   const [showHighlights, setShowHighlights] = useState(false);
@@ -65,8 +67,6 @@ export default function Home() {
 
   const currentClip = slideshowClips[currentIndex]; // Use the single declaration of currentIndex
 
-  // Control playback and mute on state or clip change
-
   // Parallax effect for stars layers
   useEffect(() => {
     const handleScroll = () => {
@@ -103,8 +103,6 @@ export default function Home() {
       setShowVideoFade(false);
     }
   }, [showHighlights]);
-
-  // …after your showHighlights useEffect…
 
   // 1) Re-apply volume and mute when the clip (or play/pause) changes
   useEffect(() => {
@@ -153,46 +151,83 @@ export default function Home() {
 
       {/* Main content */}
       <div className="relative z-20 font-sans text-white">
-        {/* Header */}
-        <header className="fixed top-0 w-full p-4 bg-transparent z-30">
-          <nav className="max-w-7xl mx-auto flex justify-between items-center">
-            <div className="text-lg font-bold" />
-            <ul className="flex gap-6 text-sm sm:text-base">
-              {["home", "about", "experience"].map((id) => (
-                <li key={id}>
-                  <a
-                    href={`#${id}`}
-                    className="capitalize hover:text-blue-500 transition-colors"
-                  >
-                    {id}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </header>
+{/* Header */}
+<header className="fixed top-0 w-full p-4 bg-transparent z-30">
+  {/* make nav relative so the absolute dropdown can be positioned relative to it */}
+  <nav className="relative max-w-7xl mx-auto flex justify-between items-center">
+    <div className="text-lg font-bold"></div>
+
+    {/* Desktop links */}
+    <ul className="hidden md:flex gap-6 text-sm md:text-base">
+      {["home", "about", "experience"].map((id) => (
+        <li key={id}>
+          <a
+            href={`#${id}`}
+            className="capitalize hover:text-blue-500 transition-colors"
+            onClick={() => setMenuOpen(false)}
+          >
+            {id}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    {/* Mobile hamburger */}
+    <button
+      className="md:hidden px-3 py-2 rounded bg-gray-800/40"
+      onClick={() => setMenuOpen((s) => !s)}
+      aria-label="Open menu"
+    >
+      ☰
+    </button>
+
+    {/* mobile menu panel - positioned absolutely under the nav/hamburger */}
+    <div
+      className={`md:hidden absolute right-4 top-full mt-2 z-50 transform transition-all duration-150 ${
+        menuOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+      }`}
+      style={{ willChange: "transform, opacity" }}
+    >
+      <div className="min-w-[160px] bg-gray-900/95 text-white rounded-lg py-2 shadow-lg backdrop-blur-sm border border-gray-800">
+        <ul className="flex flex-col">
+          {["home", "about", "experience"].map((id) => (
+            <li key={id}>
+              <a
+                href={`#${id}`}
+                onClick={() => setMenuOpen(false)}
+                className="block px-4 py-2 text-sm hover:bg-gray-800/60"
+              >
+                {id}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
 
         {/* Sections */}
         <main className="pt-0">
           {/* Home */}
           <section
             id="home"
-            className="relative min-h-screen flex items-center justify-center"
+            className="relative min-h-screen flex items-center justify-center pt-16"
           >
-            <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-8 px-6">
               <img
                 src="/Images/Image1.jpg"
                 alt="Profile"
-                className="w-96 h-96 border-2 border-white object-cover shadow-lg"
+                className="w-48 h-48 md:w-96 md:h-96 border-2 border-white object-cover shadow-lg rounded-full"
               />
               <div className="max-w-md text-center md:text-left">
-                <h1 className="text-7xl font-bold translate-x-5 -translate-y-6">
+                <h1 className="text-3xl md:text-7xl font-bold md:translate-x-5 md:-translate-y-6">
                   Daniel Coyle
                 </h1>
-                <h2 className="text-4xl font-bold cosmic-gradient translate-x-5 -translate-y-3">
+                <h2 className="text-xl md:text-4xl lg:text-5xl font-bold cosmic-gradient md:translate-x-5 md:-translate-y-3">
                   Fullstack Developer
                 </h2>
-                <p className="text-gray-300 mb-6 translate-x-5">
+                <p className="text-gray-300 mb-6 md:translate-x-5 text-sm md:text-base">
                   Hello! I’m Daniel, a passionate developer who enjoys{" "}
                   <span className="text-cyan-300 font-semibold drop-shadow-[0_0_6px_#00FFFF]">
                     exploring
@@ -208,18 +243,18 @@ export default function Home() {
                   <a
                     href="/Daniel_Coyle_Resume.pdf"
                     download
-                    className="hover:scale-110 transition-transform duration-200 bg-cyan-400 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 hover:shadow-[0_0_8px_rgb(14,188,212)] translate-x-5"
+                    className="hover:scale-110 transition-transform duration-200 bg-cyan-400 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 hover:shadow-[0_0_8px_rgb(14,188,212)] md:translate-x-5"
                   >
                     Download CV
                   </a>
                   <a
                     href="mailto:danieljcoyle02@gmail.com"
-                    className="hover:scale-110 transition-transform duration-200 bg-purple-700 text-white px-6 py-2 rounded-lg shadow-md hover:bg-gray-800 hover:shadow-[0_0_8px_rgb(139,0,255)] translate-x-5"
+                    className="hover:scale-110 transition-transform duration-200 bg-purple-700 text-white px-6 py-2 rounded-lg shadow-md hover:bg-gray-800 hover:shadow-[0_0_8px_rgb(139,0,255)] md:translate-x-5"
                   >
                     Contact Me
                   </a>
                 </div>
-                <div className="flex gap-4 mt-6 translate-x-5">
+                <div className="flex gap-4 mt-6">
                   <a
                     href="https://www.linkedin.com/in/danieljcoyle/"
                     target="_blank"
@@ -247,21 +282,21 @@ export default function Home() {
             </div>
           </section>
           {/* Divider */}
-          <div className="flex justify-center my-8">
-            <div className="w-40 h-2 bg-cyan-400 rounded transform -translate-x-96 -translate-y-36 rotate-[-45deg]" />
+          <div className="flex justify-center my-8 px-6">
+            <div className="w-40 h-2 bg-cyan-400 rounded transform md:-translate-x-96 md:-translate-y-36 md:rotate-[-45deg]" />
           </div>
 
           {/* About Me / Highlights Section */}
           <section
             id="about"
-            className="py-0 flex flex-col items-start justify-start w-full max-w-6xl mx-auto px-6 relative transform -translate-y-20 -translate-x-28"
+            className="py-8 flex flex-col items-start justify-start w-full max-w-6xl mx-auto px-6 relative md:transform md:-translate-y-20 md:-translate-x-28"
           >
-            <h2 className="text-3xl font-bold mb-4 ">About Me</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 ">About Me</h2>
 
             {!showHighlights ? (
               <>
                 {/* Typing Text */}
-                <div className="-translate-x-5">
+                <div className="md:-translate-x-5">
                   <TypingText
                     label="I&#39;m Daniel Coyle, a"
                     phrases={[
@@ -277,9 +312,7 @@ export default function Home() {
                 {/* Paragraphs */}
                 <p className="mt-5 text-gray-300 max-w-xl">
                   I recently graduated from{" "}
-                  <span className="font-bold">
-                    UC Irvine
-                  </span>{" "}
+                  <span className="font-bold">UC Irvine</span>{" "}
                   with a{" "}
                   <span className="font-bold">
                    Bachelor{"'"}s Degree in Computer Science
@@ -291,38 +324,14 @@ export default function Home() {
                     meaningful impact on people’s lives
                   </span>
                   . While at UCI, I competed as a{" "}
-                  <span className="font-bold">
-                    semi-professional esports athlete 
-                  </span>
-                  {" "}and worked as a{" "}
-                  <span className="font-bold">
-                    student software developer
-                  </span>
-                  —two roles where I{" "}
-                  led
-                  teams in high-stakes environments that demanded
-                  <span className="font-bold">
-                  {" "}discpline
-                  </span>
-                  ,{" "}
-                  <span className="font-bold">
-                    adaptability
-                  </span>
-                  , and{" "}
-                  <span className="font-bold">
-                    perserverence
-                  </span>
-                  . These experiences helped me grow as a{" "}
-                  <span className="font-bold">
-                    leader
-                  </span>
-                  , apply my skills in real-world settings, and contribute to
-                  meaningful, team-driven projects. I’m eager to continue
-                  developing innovative software alongside talented engineers
-                  who share the same drive for {" "}<span className="font-bold">
-                  impact
-                  </span>
-                  .
+                  <span className="font-bold">semi-professional esports athlete</span>{" "}
+                  and worked as a{" "}
+                  <span className="font-bold">student software developer</span>
+                  —two roles where I led teams in high-stakes environments that demanded{" "}
+                  <span className="font-bold">discpline</span>,{" "}
+                  <span className="font-bold">adaptability</span>, and{" "}
+                  <span className="font-bold">perserverence</span>. These experiences helped me grow as a{" "}
+                  <span className="font-bold">leader</span> and contribute to meaningful, team-driven projects.
                 </p>
                 <p className="mt-5 text-gray-300 max-w-xl">
                   When I&#39;m not coding, you can find me gaming with friends,
@@ -336,7 +345,7 @@ export default function Home() {
                       setShowHighlights(true); // Show highlights on click
                       setShowJourneyText(false); // Hide the journey text
                     }}
-                    className="text-4xl font-bold cosmic-gradient cursor-pointer hover:scale-105 transition-transform"
+                    className="text-2xl md:text-4xl font-bold cosmic-gradient cursor-pointer hover:scale-105 transition-transform"
                   >
                     Explore My Competitive Journey
                   </button>
@@ -353,11 +362,11 @@ export default function Home() {
                   Highlights
                 </div>
 
-                {/* Video Wrapper (fades in) */}
+                {/* Video Wrapper (responsive) */}
                 <div
                   ref={wrapperRef}
-                  className={`absolute top-20 -right-72 ml-4 w-[800px] h-[450px]
-                rounded-lg shadow-lg overflow-visible bg-transparent
+                  className={`relative md:absolute md:top-20 md:-right-72 ml-4 w-full md:w-[800px] h-56 md:h-[450px]
+                rounded-lg shadow-lg overflow-hidden bg-transparent
                 transition-opacity duration-700
                 ${showVideoFade ? "opacity-100" : "opacity-0"}`}
                 >
@@ -433,12 +442,6 @@ export default function Home() {
                       `I beat T1 Faker in soloq`,
                       `I'm a Bjergsen fan`,
                       `I peaked 1100 LP in NA soloq`,
-                      `My flash is on F`,
-                      `I'm a RoseThorn fan`,
-                      `I'm a Kurulean fan`,
-                      `I'm a Strompest fan`,
-                      `I'm a Gorica Fan`,
-                      `I'm a Joey fan`,
                     ]}
                     className="mt-6 -translate-x-0 -translate-y-4"
                   />
@@ -479,7 +482,7 @@ export default function Home() {
           </section>
 
           {/* ── Experience & Projects Section ── */}
-          <h2 id="experience" className="text-4xl font-bold mb-4 text-center">
+          <h2 id="experience" className="text-3xl md:text-4xl font-bold mb-4 text-center">
             Experience
           </h2>
 
@@ -488,7 +491,7 @@ export default function Home() {
           </div>
         </main>
         {/* Footer */}
-        <footer className="absolute bottom-0 left-0 p-4 text-gray-400 text-sm translate-y-16">
+        <footer className="relative mt-12 p-4 text-gray-400 text-sm">
           Designed and Developed by <br />
           <span className="text-white font-semibold">Daniel Coyle</span>
         </footer>
