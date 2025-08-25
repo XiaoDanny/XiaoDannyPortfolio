@@ -224,9 +224,19 @@ export default function Home() {
                 <h1 className="text-3xl md:text-7xl font-bold md:translate-x-5 md:-translate-y-6">
                   Daniel Coyle
                 </h1>
-                <h2 className="whitespace-nowrap text-xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] animate-pulse md:translate-x-5 md:-translate-y-3">
+                <h2 className="
+
+  whitespace-nowrap
+  font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400
+  bg-clip-text text-transparent
+  md:translate-x-5 md:-translate-y-3
+  text-[clamp(1rem,4.5vw,1.35rem)]
+  md:text-[clamp(1.5rem,3.2vw,2.5rem)]
+  lg:text-[clamp(2rem,2.4vw,3.25rem)]
+">
   Full Stack Developer
 </h2>
+
 
 
                 <p className="text-gray-300 mb-6 md:translate-x-5 text-sm md:text-base">
