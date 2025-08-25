@@ -224,9 +224,11 @@ export default function Home() {
                 <h1 className="text-3xl md:text-7xl font-bold md:translate-x-5 md:-translate-y-6">
                   Daniel Coyle
                 </h1>
-                <h2 className="text-xl md:text-4xl lg:text-5xl font-bold cosmic-gradient md:translate-x-5 md:-translate-y-3">
-                  Fullstack Developer
-                </h2>
+                <h2 className="whitespace-nowrap text-xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] animate-pulse md:translate-x-5 md:-translate-y-3">
+  Full Stack Developer
+</h2>
+
+
                 <p className="text-gray-300 mb-6 md:translate-x-5 text-sm md:text-base">
                   Hello! I’m Daniel, a passionate developer who enjoys{" "}
                   <span className="text-cyan-300 font-semibold drop-shadow-[0_0_6px_#00FFFF]">
@@ -304,7 +306,6 @@ export default function Home() {
                       "Gamer",
                       "Runner",
                       "Lifter",
-                      "Player",
                       "Thinker",
                     ]}
                   />
@@ -338,29 +339,34 @@ export default function Home() {
                   working out, watching good movies/shows, or playing piano.
                 </p>
 
-                {/* Explore My Competitive Journey */}
-                <div className="text-center mt-8">
-                  <button
-                    onClick={() => {
-                      setShowHighlights(true); // Show highlights on click
-                      setShowJourneyText(false); // Hide the journey text
-                    }}
-                    className="text-2xl md:text-4xl font-bold cosmic-gradient cursor-pointer hover:scale-105 transition-transform"
-                  >
-                    Explore My Competitive Journey
-                  </button>
-                </div>
+{/* Explore My Competitive Journey */}
+<div className="text-center mt-8">
+  <button
+    onClick={() => {
+      setShowHighlights(true); // Show highlights on click
+      setShowJourneyText(false); // Hide the journey text
+    }}
+    className="px-6 py-3 text-xl md:text-2xl font-semibold rounded-2xl shadow-lg 
+               bg-gradient-to-r from-purple-500 to-pink-500 text-white
+               hover:scale-105 hover:shadow-xl transition-transform duration-200"
+  >
+    Explore My Competitive Journey
+  </button>
+</div>
+
               </>
             ) : (
               <div className="w-full">
                 {/* Highlights Title */}
                 <div
-                  className={`absolute top-0 right-5 ml-4 text-4xl font-bold cosmic-gradient transition-opacity duration-700 ${
-                    showVideoFade ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  Highlights
-                </div>
+  className={`absolute top-4 right-4 text-4xl font-bold 
+              transition-opacity duration-700 ${
+                showVideoFade ? "opacity-100" : "opacity-0"
+              }`}
+>
+  Highlights
+</div>
+
 
                 {/* Video Wrapper (responsive) */}
                 <div
