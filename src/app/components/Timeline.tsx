@@ -20,7 +20,7 @@ const projects: ProjectEntry[] = [
     technologies: ["JavaScript", "React", "Expo"],
   },
   {
-    name: "League Rank Tracker",
+    name: "Rank Tracker",
     role: "Team Lead @Irvine Hacks Hackathon",
     description:
       "Allows users to create and share custom leaderboards, add friends, and compete/race eachother by tracking real-time ranking updates through an interactive dashboard.",
