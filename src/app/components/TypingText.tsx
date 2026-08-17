@@ -49,11 +49,11 @@ export default function TypingText({ phrases, label = "", className = "" }: Typi
   }, [displayText, phase, currentPhrase]);
 
   return (
-    <p className={`font-semibold translate-x-5 translate-y-1 ${className}`}>
+    <p className={`font-medium ${className}`}>
       {label && (
-        <span className="mt-5 text-gray-300">{label}&nbsp;</span>
+        <span className="text-gray-400">{label}&nbsp;</span>
       )}
-      <span className="text-cyan-300 inline-block drop-shadow-[0_0_6px_#00FFFF]">
+      <span className="italic text-white">
         {displayText}
       </span>
       <span className="cursor ml-1" />

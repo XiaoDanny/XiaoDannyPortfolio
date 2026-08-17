@@ -1,20 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import TypingText from "./components/TypingText";
-import Timeline from "./components/Timeline";
+import Projects, { FeaturedProjects } from "./components/Projects";
+import Experience from "./components/Experience";
 
 export default function Home() {
-  const starsRef = useRef<HTMLDivElement>(null);
-  const stars2Ref = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showJourneyText, setShowJourneyText] = useState(true);
-  const [showVideo, setShowVideo] = useState(false);
-  const [showHighlights, setShowHighlights] = useState(false);
-  const [showAchievementsFade, setShowAchievementsFade] = useState(false);
-  const [showVideoFade, setShowVideoFade] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [currentIndex, setCurrentIndex] = useState(0); // Declare only once
   const [isPlaying, setIsPlaying] = useState(true);
@@ -67,43 +61,6 @@ export default function Home() {
 
   const currentClip = slideshowClips[currentIndex]; // Use the single declaration of currentIndex
 
-  // Parallax effect for stars layers
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      if (starsRef.current) {
-        starsRef.current.style.transform = `translateY(${scrollY * 0.4}px)`;
-      }
-      if (stars2Ref.current) {
-        stars2Ref.current.style.transform = `translateY(${scrollY * 0.55}px)`;
-      }
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    if (showHighlights) {
-      // Reset both off
-      setShowAchievementsFade(false);
-      setShowVideoFade(false);
-
-      // 1) Fade in Achievements immediately
-      const achTimer = setTimeout(() => setShowAchievementsFade(true), 0);
-      // 2) Then fade in Video after 300ms
-      const vidTimer = setTimeout(() => setShowVideoFade(true), 300);
-
-      return () => {
-        clearTimeout(achTimer);
-        clearTimeout(vidTimer);
-      };
-    } else {
-      // Reset on hide
-      setShowAchievementsFade(false);
-      setShowVideoFade(false);
-    }
-  }, [showHighlights]);
-
   // 1) Re-apply volume and mute when the clip (or play/pause) changes
   useEffect(() => {
     const vid = videoRef.current;
@@ -139,134 +96,107 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen">
-      {/* Background gradient */}
-      <div className="absolute inset-0 linear-gradient z-0" />
-
-      {/* Parallax stars layers */}
-      <div className="absolute inset-0 z-10 pointer-events-none">
-        <div ref={starsRef} className="stars" />
-        <div ref={stars2Ref} className="stars2" />
-      </div>
-
+    <div className="relative min-h-screen bg-[#0d0d0f]">
       {/* Main content */}
       <div className="relative z-20 font-sans text-white">
-{/* Header */}
-<header className="fixed top-0 w-full p-4 bg-transparent z-30">
-  {/* make nav relative so the absolute dropdown can be positioned relative to it */}
-  <nav className="relative max-w-7xl mx-auto flex justify-between items-center">
-    <div className="text-lg font-bold"></div>
+        {/* Header */}
+        <header className="fixed top-0 w-full py-5 bg-[#0d0d0f]/80 backdrop-blur-sm z-30 border-b border-white/10">
+          <nav className="relative max-w-7xl mx-auto flex justify-center items-center">
+            {/* Desktop links */}
+            <ul className="hidden md:flex gap-10 text-xs uppercase tracking-widest text-gray-300">
+              {["home", "projects", "experience", "beyond"].map((id) => (
+                <li key={id}>
+                  <a
+                    href={`#${id}`}
+                    className="capitalize hover:text-white transition-colors"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {id}
+                  </a>
+                </li>
+              ))}
+            </ul>
 
-    {/* Desktop links */}
-    <ul className="hidden md:flex gap-6 text-sm md:text-base">
-      {["home", "about", "experience"].map((id) => (
-        <li key={id}>
-          <a
-            href={`#${id}`}
-            className="capitalize hover:text-blue-500 transition-colors"
-            onClick={() => setMenuOpen(false)}
-          >
-            {id}
-          </a>
-        </li>
-      ))}
-    </ul>
+            {/* Mobile hamburger */}
+            <button
+              className="md:hidden px-3 py-2 rounded border border-white/20 text-xs uppercase tracking-widest"
+              onClick={() => setMenuOpen((s) => !s)}
+              aria-label="Open menu"
+            >
+              Menu
+            </button>
 
-    {/* Mobile hamburger */}
-    <button
-      className="md:hidden px-3 py-2 rounded bg-gray-800/40"
-      onClick={() => setMenuOpen((s) => !s)}
-      aria-label="Open menu"
-    >
-      ☰
-    </button>
-
-    {/* mobile menu panel - positioned absolutely under the nav/hamburger */}
-    <div
-      className={`md:hidden absolute right-4 top-full mt-2 z-50 transform transition-all duration-150 ${
-        menuOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
-      }`}
-      style={{ willChange: "transform, opacity" }}
-    >
-      <div className="min-w-[160px] bg-gray-900/95 text-white rounded-lg py-2 shadow-lg backdrop-blur-sm border border-gray-800">
-        <ul className="flex flex-col">
-          {["home", "about", "experience"].map((id) => (
-            <li key={id}>
-              <a
-                href={`#${id}`}
-                onClick={() => setMenuOpen(false)}
-                className="block px-4 py-2 text-sm hover:bg-gray-800/60"
-              >
-                {id}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  </nav>
-</header>
+            {/* mobile menu panel */}
+            <div
+              className={`md:hidden absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 transform transition-all duration-150 ${
+                menuOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+              }`}
+              style={{ willChange: "transform, opacity" }}
+            >
+              <div className="min-w-[160px] bg-[#0d0d0f] text-white rounded-lg py-2 shadow-lg border border-white/10">
+                <ul className="flex flex-col">
+                  {["home", "projects", "experience", "beyond"].map((id) => (
+                    <li key={id}>
+                      <a
+                        href={`#${id}`}
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-2 text-xs uppercase tracking-widest hover:bg-white/5"
+                      >
+                        {id}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </nav>
+        </header>
 
         {/* Sections */}
         <main className="pt-0">
           {/* Home */}
           <section
             id="home"
-            className="relative min-h-screen flex items-center justify-center pt-16"
+            className="relative min-h-screen flex flex-col items-center justify-center gap-16 pt-32 pb-16"
           >
-            <div className="flex flex-col md:flex-row items-center justify-center gap-8 px-6">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-12 px-6">
               <img
-                src="/Images/Image1.jpg"
+                src="/Images/NewXiaoDannySelfie.jpg"
                 alt="Profile"
-                className="w-48 h-48 md:w-96 md:h-96 border-2 border-white object-cover shadow-lg rounded-full"
+                className="w-48 h-48 md:w-80 md:h-80 object-cover rounded-full border border-white/15"
               />
               <div className="max-w-md text-center md:text-left">
-                <h1 className="text-3xl md:text-7xl font-bold md:translate-x-5 md:-translate-y-6">
+                <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
                   Daniel Coyle
                 </h1>
-                <h2 className="
+                <h2 className="mt-2 text-sm md:text-base uppercase tracking-widest text-gray-400">
+                  Full Stack Developer
+                </h2>
 
-  whitespace-nowrap
-  font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400
-  bg-clip-text text-transparent
-  md:translate-x-5 md:-translate-y-3
-  text-[clamp(1rem,4.5vw,1.35rem)]
-  md:text-[clamp(1.5rem,3.2vw,2.5rem)]
-  lg:text-[clamp(2rem,2.4vw,3.25rem)]
-">
-  Full Stack Developer
-</h2>
-
-
-
-                <p className="text-gray-300 mb-6 md:translate-x-5 text-sm md:text-base">
-                  Hello! I’m Daniel, a passionate developer who enjoys{" "}
-                  <span className="text-cyan-300 font-semibold drop-shadow-[0_0_6px_#00FFFF]">
-                    exploring
-                  </span>{" "}
+                <p className="text-gray-300 mt-6 mb-8 text-sm md:text-base leading-relaxed">
+                  Hello! I&rsquo;m Daniel, a passionate developer who enjoys{" "}
+                  <span className="italic text-white">exploring</span>{" "}
                   new technologies and{" "}
-                  <span className="text-cyan-300 font-semibold drop-shadow-[0_0_6px_#00FFFF]">
-                    building
-                  </span>{" "}
-                  impactful web applications. I’m excited to share
+                  <span className="italic text-white">building</span>{" "}
+                  impactful web applications. I&rsquo;m excited to share
                   my journey and what motivates me.
                 </p>
                 <div className="flex flex-col md:flex-row gap-4">
                   <a
                     href="/DanielCoyleResumeSep2025.pdf"
                     download
-                    className="hover:scale-110 transition-transform duration-200 bg-cyan-400 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-600 hover:shadow-[0_0_8px_rgb(14,188,212)] md:translate-x-5"
+                    className="border border-white/20 text-white px-6 py-2 rounded-full text-sm uppercase tracking-widest hover:bg-white hover:text-black transition-colors"
                   >
                     Download CV
                   </a>
                   <a
                     href="mailto:danieljcoyle02@gmail.com"
-                    className="hover:scale-110 transition-transform duration-200 bg-purple-700 text-white px-6 py-2 rounded-lg shadow-md hover:bg-gray-800 hover:shadow-[0_0_8px_rgb(139,0,255)] md:translate-x-5"
+                    className="border border-white/20 text-white px-6 py-2 rounded-full text-sm uppercase tracking-widest hover:bg-white hover:text-black transition-colors"
                   >
                     Contact Me
                   </a>
                 </div>
-                <div className="flex gap-4 mt-6 md:translate-x-4">
+                <div className="flex justify-center md:justify-start gap-4 mt-8">
                   <a
                     href="https://www.linkedin.com/in/danieljcoyle/"
                     target="_blank"
@@ -275,7 +205,7 @@ export default function Home() {
                     <img
                       src="/Images/Image2.svg"
                       alt="LinkedIn"
-                      className="w-12 h-12 hover:opacity-80 transition-opacity"
+                      className="w-9 h-9 grayscale opacity-70 hover:opacity-100 transition-opacity"
                     />
                   </a>
                   <a
@@ -286,225 +216,130 @@ export default function Home() {
                     <img
                       src="/Images/Image3.svg"
                       alt="GitHub"
-                      className="w-12 h-12 hover:opacity-80 transition-opacity"
+                      className="w-9 h-9 grayscale opacity-70 hover:opacity-100 transition-opacity"
                     />
                   </a>
                 </div>
               </div>
             </div>
+
+            <div className="w-full px-6">
+              <p className="mb-5 text-center text-[10px] uppercase tracking-[0.32em] text-gray-500">
+                Featured 
+              </p>
+              <FeaturedProjects />
+            </div>
           </section>
           {/* Divider */}
           <div className="flex justify-center my-8 px-6">
-            <div className="w-40 h-2 bg-cyan-400 rounded transform md:-translate-x-96 md:-translate-y-36 md:rotate-[-45deg]" />
+            <div className="w-24 h-px bg-white/15" />
           </div>
 
-          {/* About Me / Highlights Section */}
+          {/* About Me Section */}
           <section
-            id="about"
-            className="py-8 flex flex-col items-start justify-start w-full max-w-6xl mx-auto px-6 relative md:transform md:-translate-y-20 md:-translate-x-28"
+            id="projects"
+            className="py-16 w-full max-w-6xl mx-auto px-6"
           >
-            <h2 className="text-2xl md:text-3xl font-bold mb-4 ">About Me</h2>
-
-            {!showHighlights ? (
-              <>
-                {/* Typing Text */}
-                <div className="md:-translate-x-5">
-                  <TypingText
-                    label="I&#39;m Daniel Coyle, a"
-                    phrases={[
-                      "Coder",
-                      "Gamer",
-                      "Runner",
-                      "Lifter",
-                      "Thinker",
-                    ]}
-                  />
-                </div>
-                {/* Paragraphs */}
-                <p className="mt-5 text-gray-300 max-w-xl">
-                  I recently graduated from{" "}
-                  <span className="font-bold">UC Irvine</span>{" "}
-                  with a{" "}
-                  <span className="font-bold">
-                   Bachelor{"'"}s Degree in Computer Science
-                  </span>
-                  . During my time as a student, I developed a strong
-                  passion for solving complex problems and building web
-                  applications that make a{" "}
-                  <span className="font-bold">
-                    meaningful impact on people’s lives
-                  </span>
-                  . While at UCI, I competed as a{" "}
-                  <span className="font-bold">semi-professional esports athlete</span>{" "}
-                  and worked as a{" "}
-                  <span className="font-bold">student software developer</span>
-                  —two roles where I led teams in high-stakes environments that demanded{" "}
-                  <span className="font-bold">discpline</span>,{" "}
-                  <span className="font-bold">adaptability</span>, and{" "}
-                  <span className="font-bold">perserverence</span>. These experiences helped me grow as a{" "}
-                  <span className="font-bold">leader</span> and contribute to meaningful, team-driven projects.
-                </p>
-                <p className="mt-5 text-gray-300 max-w-xl">
-                  When I&#39;m not coding, you can find me gaming with friends,
-                  working out, watching good movies/shows, or playing piano.
-                </p>
-
-{/* Explore My Competitive Journey */}
-<div className="text-center mt-8">
-  <button
-    onClick={() => {
-      setShowHighlights(true); // Show highlights on click
-      setShowJourneyText(false); // Hide the journey text
-    }}
-    className="px-6 py-3 text-xl md:text-2xl font-semibold rounded-2xl shadow-lg 
-               bg-gradient-to-r from-purple-500 to-pink-500 text-white
-               hover:scale-105 hover:shadow-xl transition-transform duration-200"
-  >
-    Explore My Competitive Journey
-  </button>
-</div>
-
-              </>
-            ) : (
-              <div className="w-full">
-                {/* Highlights Title */}
-                <div
-  className={`absolute top-4 right-4 text-4xl font-bold 
-              transition-opacity duration-700 ${
-                showVideoFade ? "opacity-100" : "opacity-0"
-              }`}
->
-  Highlights
-</div>
-
-
-                {/* Video Wrapper (responsive) */}
-                <div
-                  ref={wrapperRef}
-                  className={`relative md:absolute md:top-20 md:-right-72 ml-4 w-full md:w-[800px] h-56 md:h-[450px]
-                rounded-lg shadow-lg overflow-hidden bg-transparent
-                transition-opacity duration-700
-                ${showVideoFade ? "opacity-100" : "opacity-0"}`}
-                >
-                  <button
-                    onClick={handlePrev}
-                    className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-gray-800 text-white px-3 py-2 rounded-full hover:bg-gray-700 z-20"
-                  >
-                    ←
-                  </button>
-                  <video
-                    key={currentClip.name}
-                    ref={videoRef}
-                    src={`/Clips/${currentClip.name}.mp4`}
-                    controls
-                    className="w-full h-full object-contain z-10"
-                    onEnded={() => {
-                      handleVideoEnded();
-                      if (document.fullscreenElement)
-                        wrapperRef.current?.requestFullscreen();
-                    }}
-                  />
-                  <button
-                    onClick={handleNext}
-                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-gray-800 text-white px-3 py-2 rounded-full hover:bg-gray-700 z-20"
-                  >
-                    →
-                  </button>
-                </div>
-
-                {/* Notable Achievements (fades in after) */}
-                <div
-                  className={`mt-5 p-6 rounded-lg shadow-lg  max-w-xl
-                              transition-opacity duration-700
-                              ${
-                                showAchievementsFade
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              }`}
-                  style={{
-                    transitionDelay: "500ms",
-                    transitionDuration: "1700ms",
-                  }}
-                >
-                  <h3 className="text-2xl font-bold text-white mb-4">
-                    {" "}
-                    <span className="text-cyan-300 font-semibold drop-shadow-[0_0_6px_#00FFFF]">
-                      Notable Achievements
-                    </span>{" "}
-                  </h3>
-                  <div>
-                    <ul className="list-disc list-inside text-gray-300 space-y-2">
-                      <li>IGN: XiaoDanny</li>
-                      <li>UCI Esports Scholarship Athlete 2021-2025</li>
-                      <li>Game: League of Legends</li>
-                      <li>
-                        Maintained Challenger (0.01% NA ranking) while balancing
-                        academics
-                      </li>
-                      <li>
-                        Primary shotcaller and leader on multiple
-                        semi-professional teams
-                      </li>
-                      <li>Led multiple deep runs in high-stakes tournaments</li>
-                    </ul>
-                  </div>
-
-                  <TypingText
-                    label="Fun Fact:"
-                    phrases={[
-                      `I play midlane`,
-                      `My current favorite champion is Taliyah`,
-                      `My favorite pro-player is Zeka`,
-                      `I beat T1 Faker in soloq`,
-                      `I'm a Bjergsen fan`,
-                      `I peaked 1100 LP in NA soloq`,
-                    ]}
-                    className="mt-6 -translate-x-0 -translate-y-4"
-                  />
-                  {/* Clip Details */}
-                  <div className="mt-4">
-                    <h3 className="text-xl font-semibold text-white">
-                      Clip Context:
-                    </h3>
-                  </div>
-
-                  {/* Clip Story */}
-                  <div
-                    className={`
-    mt-4 text-gray-300 transition-opacity duration-700 -translate-y-2
-    ${showVideoFade ? "opacity-100" : "opacity-0"}
-  `}
-                    style={{
-                      transitionDelay: "600ms",
-                      transitionDuration: "700ms",
-                    }}
-                  >
-                    {currentClip.story}
-                  </div>
-
-                  {/* Back Button */}
-                  <button
-                    onClick={() => {
-                      setShowHighlights(false); // Hide video and achievements
-                      setShowJourneyText(true); // Show original paragraphs
-                    }}
-                    className="mt-6 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
-                  >
-                    Back
-                  </button>
-                </div>
-              </div>
-            )}
+            <h2 className="text-2xl md:text-3xl font-bold mb-8">Projects</h2>
+            <Projects />
           </section>
 
-          {/* ── Experience & Projects Section ── */}
-          <h2 id="experience" className="text-3xl md:text-4xl font-bold mb-4 text-center">
-            Experience
-          </h2>
+          {/* ── Experience Section ── */}
+          <section
+            id="experience"
+            className="py-16 w-full max-w-6xl mx-auto px-6"
+          >
+            <h2 className="text-2xl md:text-3xl font-bold mb-8">Experience</h2>
+            <Experience />
+          </section>
 
-          <div className="max-w-6xl mx-auto px-6">
-            <Timeline />
-          </div>
+          {/* ── Beyond the Code Section ── */}
+          <section
+            id="beyond"
+            className="py-16 max-w-6xl mx-auto px-6 border-t border-white/10"
+          >
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">Beyond the Code</h2>
+            <p className="text-gray-400 text-sm md:text-base mb-8 max-w-2xl">
+              Outside of software, I competed as a semi-professional League of
+              Legends player. It&#39;s where I first learned to lead under
+              pressure—a mindset that now carries directly into how I approach
+              engineering.
+            </p>
+
+            <div className="flex flex-col lg:flex-row gap-8">
+              {/* Video Carousel */}
+              <div
+                ref={wrapperRef}
+                className="relative w-full lg:w-[560px] h-56 md:h-[380px] rounded-lg overflow-hidden bg-black/40 border border-white/10 flex-shrink-0"
+              >
+                <button
+                  onClick={handlePrev}
+                  className="absolute top-1/2 left-2 -translate-y-1/2 bg-black/60 border border-white/20 text-white w-8 h-8 rounded-full hover:bg-white hover:text-black transition-colors z-20"
+                >
+                  ←
+                </button>
+                <video
+                  key={currentClip.name}
+                  ref={videoRef}
+                  src={`/Clips/${currentClip.name}.mp4`}
+                  controls
+                  className="w-full h-full object-contain z-10"
+                  onEnded={() => {
+                    handleVideoEnded();
+                    if (document.fullscreenElement)
+                      wrapperRef.current?.requestFullscreen();
+                  }}
+                />
+                <button
+                  onClick={handleNext}
+                  className="absolute top-1/2 right-2 -translate-y-1/2 bg-black/60 border border-white/20 text-white w-8 h-8 rounded-full hover:bg-white hover:text-black transition-colors z-20"
+                >
+                  →
+                </button>
+              </div>
+
+              {/* Achievements */}
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-widest">
+                  Notable Achievements
+                </h3>
+                <ul className="list-disc list-inside text-gray-300 space-y-2 text-sm">
+                  <li>IGN: XiaoDanny</li>
+                  <li>UCI Esports Scholarship Athlete 2021-2025</li>
+                  <li>Game: League of Legends</li>
+                  <li>
+                    Maintained Challenger (0.01% NA ranking) while balancing
+                    academics
+                  </li>
+                  <li>
+                    Primary shotcaller and leader on multiple
+                    semi-professional teams
+                  </li>
+                  <li>Led multiple deep runs in high-stakes tournaments</li>
+                </ul>
+
+                <TypingText
+                  label="Fun Fact:"
+                  phrases={[
+                    `I play midlane`,
+                    `My current favorite champion is Taliyah`,
+                    `My favorite pro-player is Zeka`,
+                    `I beat T1 Faker in soloq`,
+                    `I'm a Bjergsen fan`,
+                    `I peaked 1100 LP in NA soloq`,
+                  ]}
+                  className="mt-6"
+                />
+
+                <h4 className="mt-4 text-sm font-semibold uppercase tracking-widest text-gray-400">
+                  Clip Context
+                </h4>
+                <p className="mt-2 text-gray-300 text-sm leading-relaxed">
+                  {currentClip.story}
+                </p>
+              </div>
+            </div>
+          </section>
         </main>
         {/* Footer */}
         <footer className="relative mt-12 p-4 text-gray-400 text-sm">

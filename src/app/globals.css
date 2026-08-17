@@ -3,45 +3,24 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0d0d0f;
+  --foreground: #f5f5f2;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-/* globals.css */
-@keyframes cosmicShift {
-  0%   { background-position:   0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position:   0% 50%; }
-}
-
-/* 2. The CSS class you’ll apply to your <h1> */
-.cosmic-gradient {
-  background: linear-gradient(
-    270deg,
-    #0d1b2a,  /* deep space navy */
-    #2c3e50,  /* twilight indigo */
-    #4b0082,  /* cosmic purple */
-    #1e213a,  /* mid-space blue */
-    #0d1b2a   /* back to navy for smooth loop */
-  );
-  background-size: 800% 800%;
-  animation: cosmicShift 10s ease infinite;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  
-}
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0; }
 }
+
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
 .cursor {
   display: inline-block;
   width: 1px;
@@ -50,84 +29,12 @@
   animation: blink 1s step-start infinite;
 }
 
-
-
-
 body {
-  background: radial-gradient(
-    circle at center,
-    #111626 0%,     /* slightly darker than #121829 */
-    #0f1323 10%,
-    #0d111f 20%,
-    #0c101f 30%,    /* deep space blue, gently darkened */
-    #0b0f1c 45%,
-    #0a0d1a 60%,
-    #090b18 75%,
-    #080a14 90%,    /* dark navy, nudged down */
-    #000000 100%    /* pure black */
-  );
-  color: white;
+  background: var(--background);
+  color: var(--foreground);
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  font-family: var(--font-geist-sans), sans-serif;
   overflow-x: hidden;
-  z-index: -5;
   position: relative;
-}
-
-.cosmic-divider {
-  width: 100%;
-  height: 1px;                             /* thin line */
-  margin: 2rem 0;                          /* spacing above/below */
-  background: linear-gradient(
-    to right,
-    rgba(11, 15, 28, 0) 0%,                /* fully transparent at edges */
-    rgba(0, 255, 255, 0.3) 30%,            /* faint cyan glow */
-    rgba(139, 0, 255, 0.3) 70%,            /* faint purple glow */
-    rgba(11, 15, 28, 0) 100%               /* back to transparent */
-  );
-}
-
-/* First layer: bright, faster twinkle */
-.stars::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0;
-  width: 2px; height: 2px;        /* one tiny dot */
-  border-radius: 50%;
-  background: white;
-  box-shadow:
-    50vw 20vh white,
-    80vw 40vh #aaa,
-    10vw 30vh white,
-    30vw 90vh #ccc,
-    70vw 70vh white,
-    60vw 10vh #ddd,
-    20vw 80vh white,
-    90vw 50vh #999;
-  animation: twinkle 4s infinite ease-in-out alternate;
-  opacity: 0.9;
-}
-
-/* Second layer: dimmer, slower twinkle */
-.stars2::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0;
-  width: 2px; height: 2px;
-  border-radius: 50%;
-  background: white;
-  box-shadow:
-    25vw 10vh white,
-    60vw 80vh #aaa,
-    15vw 50vh white,
-    85vw 70vh #ccc;
-  animation: twinkle 6s infinite ease-in-out alternate;
-  opacity: 0.7;
-}
-
-/* Twinkle keyframes */
-@keyframes twinkle {
-  0%, 100% { opacity: 0.5; }
-  50%      { opacity: 1;   }
 }
