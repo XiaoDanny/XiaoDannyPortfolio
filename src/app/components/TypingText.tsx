@@ -17,6 +17,7 @@ export default function TypingText({ phrases, label = "", className = "" }: Typi
 
   // Helper function to get a random index different from the current one
   const getRandomIndex = (currentIndex: number, length: number): number => {
+    if (length <= 1) return 0;
     let randomIndex;
     do {
       randomIndex = Math.floor(Math.random() * length);
@@ -26,6 +27,8 @@ export default function TypingText({ phrases, label = "", className = "" }: Typi
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
+
+    if (phrases.length === 0) return;
 
     if (phase === "typing") {
       const nextChar = phrases[currentPhrase].slice(0, displayText.length + 1);
@@ -46,7 +49,7 @@ export default function TypingText({ phrases, label = "", className = "" }: Typi
     }
 
     return () => clearTimeout(timeout);
-  }, [displayText, phase, currentPhrase]);
+  }, [displayText, phase, currentPhrase, phrases]);
 
   return (
     <p className={`font-medium ${className}`}>

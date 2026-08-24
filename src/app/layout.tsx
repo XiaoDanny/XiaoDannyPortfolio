@@ -1,5 +1,5 @@
 // app/layout.tsx
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -15,13 +15,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Daniel Coyle Portfolio",
-  description: "Portfolio — Daniel Coyle (Fullstack Developer, UCI)",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-  },
-  // optional:
-  // themeColor: "#0ea5a4",
+  description: "Portfolio — Daniel Coyle (Software Engineer, UCI)",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

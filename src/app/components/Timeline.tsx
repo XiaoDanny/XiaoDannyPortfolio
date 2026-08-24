@@ -23,7 +23,7 @@ const projects: ProjectEntry[] = [
     name: "Rank Tracker",
     role: "Team Lead @Irvine Hacks Hackathon",
     description:
-      "Allows users to create and share custom leaderboards, add friends, and compete/race eachother by tracking real-time ranking updates through an interactive dashboard.",
+      "Allows users to create and share custom leaderboards, add friends, and compete or race each other by tracking real-time ranking updates through an interactive dashboard.",
     date: "March 2025",
     technologies: ["JavaScript", "Python", "React", "Flask", "SQLite"],
   },
@@ -37,7 +37,7 @@ const projects: ProjectEntry[] = [
   },
   {
     name: "Cooling Center Locator",
-    role: "Software Engineer @The California Instutute of Techology",
+    role: "Software Engineer @The California Institute of Technology",
     description:
       "Locates nearby cooling centers based on the user’s location and provides helpful tips to stay cool during heatwaves.",
     date: "March-June 2024",
@@ -49,7 +49,7 @@ const projects: ProjectEntry[] = [
     description:
       "A web crawler and search system designed to extract and organize content from UCI’s official website.",
     date: "March-June 2023",
-    technologies: ["React", "Node", "Python", "Flash", "OpenAI API"],
+    technologies: ["React", "Node", "Python", "Flask", "OpenAI API"],
   },
 ];
 
@@ -116,10 +116,6 @@ function TimelineItem({
     ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}
     ${isLeft ? "text-left pr-4" : "text-right pl-4"}
   `;
-
-  const arrowClasses = `absolute top-2 ${
-    isLeft ? "-right-1" : "-left-1"
-  } w-3 h-3 rotate-45 bg-cyan-400 z-10`;
 
   const datePosition = `absolute top-2 text-sm text-gray-400 ${
     isLeft
