@@ -4,8 +4,16 @@ import Link from "next/link";
 import Projects, { FeaturedProjects } from "./components/Projects";
 import Experience from "./components/Experience";
 
+const photos = [
+  { src: "/Images/BeyondTheCode/Daniel1.jpg", alt: "Daniel Coyle", objectPosition: "center 35%" },
+  { src: "/Images/BeyondTheCode/Gym.jpg", alt: "Daniel Coyle at the gym", objectPosition: "center 30%" },
+  { src: "/Images/BeyondTheCode/Daniel2.jpg", alt: "Daniel Coyle at Yellowstone National Park", objectPosition: "52% 55%" },
+  { src: "/Images/BeyondTheCode/LookingUp.jpg", alt: "Daniel Coyle, UC Irvine Class of 2025", objectPosition: "30% 30%" },
+];
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activePhoto, setActivePhoto] = useState(0);
 
   const navLinks = [
     { id: "home", href: "#home" },
@@ -107,11 +115,6 @@ export default function Home() {
             className="relative scroll-mt-20 min-h-[85vh] flex flex-col items-center justify-center gap-16 pt-32 pb-10"
           >
             <div className="flex flex-col md:flex-row items-center justify-center gap-12 px-6">
-              <img
-                src="/Images/NewXiaoDannySelfie.jpg"
-                alt="Profile"
-                className="w-48 h-48 md:w-80 md:h-80 object-cover rounded-full border border-white/15"
-              />
               <div className="max-w-md text-center md:text-left">
                 <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
                   Daniel Coyle
@@ -124,22 +127,29 @@ export default function Home() {
                   Hi there! I&rsquo;m Daniel, a Computer Science graduate from UC Irvine.
                   I&rsquo;m excited to share my journey and some of the things I&rsquo;ve been building.
                 </p>
-                <div className="flex flex-col md:flex-row gap-4">
+                <div className="mt-7 flex flex-wrap items-center justify-center gap-4 md:justify-start">
                   <a
                     href="/DanielCoyleResumeSep2025.pdf"
                     download
-                    className="border border-white/20 text-white px-6 py-2 rounded-full text-sm uppercase tracking-widest hover:bg-white hover:text-black transition-colors"
+                    className="inline-flex h-10 items-center gap-3 rounded-md border border-white/20 px-4 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-black"
                   >
-                    Download CV
+                    Resume
+                    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="1.8">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <path d="M14 2v6h6M12 11v6m0 0-3-3m3 3 3-3" />
+                    </svg>
                   </a>
                   <a
                     href="mailto:danieljcoyle02@gmail.com"
-                    className="border border-white/20 text-white px-6 py-2 rounded-full text-sm uppercase tracking-widest hover:bg-white hover:text-black transition-colors"
+                    aria-label="Email Daniel Coyle"
+                    title="Email Daniel Coyle"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-white/20 text-white transition-colors hover:bg-white hover:text-black"
                   >
-                    Contact Me
+                    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="1.8">
+                      <rect x="3" y="5" width="18" height="14" rx="2" />
+                      <path d="m4 7 8 6 8-6" />
+                    </svg>
                   </a>
-                </div>
-                <div className="flex justify-center md:justify-start gap-4 mt-8">
                   <a
                     href="https://www.linkedin.com/in/danieljcoyle/"
                     target="_blank"
@@ -148,7 +158,7 @@ export default function Home() {
                     <img
                       src="/Images/Image2.svg"
                       alt="LinkedIn"
-                      className="w-9 h-9 grayscale opacity-70 hover:opacity-100 transition-opacity"
+                      className="h-9 w-9 grayscale opacity-70 transition-opacity hover:opacity-100"
                     />
                   </a>
                   <a
@@ -159,10 +169,39 @@ export default function Home() {
                     <img
                       src="/Images/Image3.svg"
                       alt="GitHub"
-                      className="w-9 h-9 grayscale opacity-70 hover:opacity-100 transition-opacity"
+                      className="h-9 w-9 grayscale opacity-70 transition-opacity hover:opacity-100"
                     />
                   </a>
                 </div>
+              </div>
+
+              <div className="flex flex-col items-center" aria-label="Photo carousel">
+                <button
+                  type="button"
+                  onClick={() => setActivePhoto((current) => (current + 1) % photos.length)}
+                  aria-label={`Show next photo. Currently showing photo ${activePhoto + 1} of ${photos.length}`}
+                  className="relative h-64 w-52 cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-[#0d0d0f] sm:h-80 sm:w-64 md:h-[27rem] md:w-[22rem]"
+                >
+                  {photos.map((photo, photoIndex) => {
+                    const position = (photoIndex - activePhoto + photos.length) % photos.length;
+                    const positionClasses = [
+                      "z-30 translate-x-0 translate-y-0 rotate-0 scale-100 opacity-100",
+                      "z-20 translate-x-7 translate-y-3 rotate-3 scale-[.94] opacity-80",
+                      "z-10 -translate-x-7 translate-y-6 -rotate-3 scale-[.88] opacity-55",
+                      "z-0 translate-x-12 translate-y-9 rotate-6 scale-[.82] opacity-35",
+                    ];
+
+                    return (
+                      <img
+                        key={photo.src}
+                        src={photo.src}
+                        alt={photo.alt}
+                        style={{ objectPosition: photo.objectPosition }}
+                        className={`absolute inset-0 h-64 w-52 rounded-xl object-cover shadow-2xl sm:h-80 sm:w-64 md:h-[27rem] md:w-[22rem] ${positionClasses[position]}`}
+                      />
+                    );
+                  })}
+                </button>
               </div>
             </div>
 

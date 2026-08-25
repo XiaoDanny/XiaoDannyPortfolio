@@ -5,21 +5,6 @@ export const metadata = {
   description: "A few things I enjoy in my free time.",
 };
 
-// Fanned photo collage
-const photos: {
-  src: string;
-  alt: string;
-  rotate: string;
-  offset: string;
-  baseZ: string;
-  objectPosition: string;
-}[] = [
-  { src: "/Images/BeyondTheCode/Daniel1.jpg", alt: "Daniel Coyle", rotate: "-rotate-6", offset: "translate-y-2", baseZ: "z-0", objectPosition: "center 35%" },
-  { src: "/Images/BeyondTheCode/Gym.jpg", alt: "Daniel Coyle at the gym", rotate: "rotate-3", offset: "-translate-y-3", baseZ: "z-10", objectPosition: "center 30%" },
-  { src: "/Images/BeyondTheCode/Daniel2.jpg", alt: "Daniel Coyle at Yellowstone National Park", rotate: "-rotate-3", offset: "translate-y-1", baseZ: "z-20", objectPosition: "52% 55%" },
-  { src: "/Images/BeyondTheCode/LookingUp.jpg", alt: "Daniel Coyle, UC Irvine Class of 2025", rotate: "rotate-6", offset: "-translate-y-2", baseZ: "z-30", objectPosition: "30% 30%" },
-];
-
 export default function BeyondPage() {
   return (
     <div className="min-h-screen bg-[#0d0d0f] text-white font-sans">
@@ -43,25 +28,6 @@ export default function BeyondPage() {
           <p className="mt-3 text-gray-400 text-sm md:text-base">
             A little more of me!
           </p>
-        </div>
-
-        {/* Photo collage — hover a photo to pop it forward */}
-        <div className="flex justify-center items-center py-6">
-          {photos.map((photo, i) => (
-            <div
-              key={i}
-              className={`relative ${photo.rotate} ${photo.offset} ${photo.baseZ} ${
-                i === 0 ? "" : "-ml-7 sm:-ml-10 md:-ml-14"
-              } transition-transform duration-300 ease-out hover:z-40 hover:-translate-y-6 hover:rotate-0 hover:scale-110`}
-            >
-              <img
-                src={photo.src}
-                alt={photo.alt}
-                style={{ objectPosition: photo.objectPosition }}
-                className="w-24 h-32 sm:w-40 sm:h-52 md:w-56 md:h-72 object-cover rounded-lg border-2 sm:border-[3px] md:border-4 border-white shadow-xl"
-              />
-            </div>
-          ))}
         </div>
 
         {/* Hobbies */}
