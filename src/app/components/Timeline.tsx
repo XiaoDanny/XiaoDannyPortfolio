@@ -17,7 +17,7 @@ const projects: ProjectEntry[] = [
     description:
       "Tracks and visualizes user travel history by automatically marking visited locations over time.",
     date: "June 2025 - Present",
-    technologies: ["JavaScript", "React", "Expo"],
+    technologies: ["JavaScript", "React", "Node.js", "Expo"],
   },
   {
     name: "Rank Tracker",

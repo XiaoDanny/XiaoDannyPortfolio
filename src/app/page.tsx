@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import Projects, { FeaturedProjects } from "./components/Projects";
+import Projects from "./components/Projects";
 import Experience from "./components/Experience";
 
 const photos = [
@@ -22,22 +22,24 @@ export default function Home() {
     { id: "beyond", href: "/beyond" },
   ];
 
+  const CONTAINER = "mx-auto w-full max-w-6xl px-6";
+
   return (
-    <div className="relative min-h-screen bg-[#0d0d0f]">
+    <div className="bg-canvas relative min-h-screen">
       {/* Main content */}
       <div className="relative z-20 font-sans text-white">
         {/* Header */}
-        <header className="fixed top-0 w-full py-5 bg-[#0d0d0f]/80 backdrop-blur-sm z-30 border-b border-white/10">
-          <nav className="relative max-w-7xl mx-auto flex justify-center items-center">
+        <header className="fixed top-0 z-[9999] w-full border-b border-subtle bg-[#0f1115] py-4 isolate">
+          <nav className={`relative flex items-center justify-center ${CONTAINER}`}>
             {/* Desktop links */}
-            <ul className="hidden md:flex gap-10 text-xs uppercase tracking-widest text-gray-300 items-center">
+            <ul className="hidden items-center gap-8 text-[11px] uppercase tracking-[0.22em] text-gray-300 md:flex">
               {navLinks.map(({ id, href }) =>
                 id === "beyond" ? (
                   <li key={id}>
                     <Link
                       href={href}
                       onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-1 capitalize border border-white/20 rounded-full px-3 py-1 hover:text-white hover:border-white/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                      className="flex items-center gap-1 rounded-full border border-white/20 px-3 py-1 hover:border-white/40 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                     >
                       {id}
                       <span aria-hidden="true">↗</span>
@@ -59,7 +61,7 @@ export default function Home() {
 
             {/* Mobile hamburger */}
             <button
-              className="md:hidden px-3 py-2 rounded border border-white/20 text-xs uppercase tracking-widest focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="md:hidden rounded border border-white/20 px-3 py-1.5 text-[11px] uppercase tracking-[0.22em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               onClick={() => setMenuOpen((s) => !s)}
               aria-expanded={menuOpen}
               aria-controls="mobile-navigation"
@@ -75,7 +77,7 @@ export default function Home() {
                 menuOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
               }`}
             >
-              <div className="min-w-[160px] bg-[#0d0d0f] text-white rounded-lg py-2 shadow-lg border border-white/10">
+              <div className="bg-surface min-w-[160px] rounded-lg border border-subtle py-2 text-white shadow-lg">
                 <ul className="flex flex-col">
                   {navLinks.map(({ id, href }) =>
                     id === "beyond" ? (
@@ -83,7 +85,7 @@ export default function Home() {
                         <Link
                           href={href}
                           onClick={() => setMenuOpen(false)}
-                          className="flex items-center gap-1 px-4 py-2 text-xs uppercase tracking-widest hover:bg-white/5 focus-visible:outline-none focus-visible:bg-white/10"
+                          className="flex items-center gap-1 px-4 py-2 text-[11px] uppercase tracking-[0.22em] hover:bg-white/5 focus-visible:outline-none focus-visible:bg-white/10"
                         >
                           {id}
                           <span aria-hidden="true">↗</span>
@@ -94,7 +96,7 @@ export default function Home() {
                         <a
                           href={href}
                           onClick={() => setMenuOpen(false)}
-                          className="block px-4 py-2 text-xs uppercase tracking-widest hover:bg-white/5 focus-visible:outline-none focus-visible:bg-white/10"
+                          className="block px-4 py-2 text-[11px] uppercase tracking-[0.22em] hover:bg-white/5 focus-visible:outline-none focus-visible:bg-white/10"
                         >
                           {id}
                         </a>
@@ -112,22 +114,32 @@ export default function Home() {
           {/* Home */}
           <section
             id="home"
-            className="relative scroll-mt-20 min-h-[85vh] flex flex-col items-center justify-center gap-16 pt-32 pb-10"
+            className="relative scroll-mt-20 flex min-h-[60vh] flex-col justify-start gap-6 pt-28 pb-0 md:min-h-[64vh] md:pt-32"
           >
-            <div className="flex flex-col md:flex-row items-center justify-center gap-12 px-6">
-              <div className="max-w-md text-center md:text-left">
-                <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-                  Daniel Coyle
+            <div className={`flex flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-center lg:gap-6 ${CONTAINER}`}>
+              <div className="w-full text-center lg:w-auto lg:text-left">
+                <h1 className="whitespace-nowrap text-[2.35rem] font-semibold tracking-[-0.05em] text-white md:text-[3.1rem] xl:text-[3.8rem]">
+                  Hi <span aria-hidden="true">👋</span>, I&rsquo;m Daniel
                 </h1>
-                <h2 className="mt-2 text-sm md:text-base uppercase tracking-widest text-gray-400">
-                  Software Engineer
-                </h2>
 
-                <p className="mt-6 mb-8 text-sm leading-relaxed text-gray-300 md:text-base">
-                  Hi there! I&rsquo;m Daniel, a Computer Science graduate from UC Irvine.
-                  I&rsquo;m excited to share my journey and some of the things I&rsquo;ve been building.
+                <p className="mx-auto mt-6 max-w-sm text-base font-medium leading-none text-gray-200 md:text-[1.1rem] lg:mx-0">
+                  I&rsquo;m
                 </p>
-                <div className="mt-7 flex flex-wrap items-center justify-center gap-4 md:justify-start">
+
+                <p className="mx-auto mt-2 inline-flex max-w-sm items-center gap-2 text-lg font-semibold leading-tight text-white md:text-[1.45rem] lg:mx-0">
+                  <span>a recent CS graduate from UC Irvine</span>
+                  <img src="/Images/Experience/UCIesports.png" alt="UCI logo" className="h-5 w-5 object-contain md:h-6 md:w-6" />
+                </p>
+
+                <p className="mx-auto mt-2 max-w-sm text-base font-medium leading-tight text-gray-200 md:text-[1.1rem] lg:mx-0">
+                  a Software Engineer @ TBD
+                </p>
+
+                <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-gray-400 md:text-base lg:mx-0">
+                  currently based in Birmingham, Alabama <span aria-hidden="true">📍</span> <span aria-hidden="true">🇺🇸</span> <span aria-hidden="true">🇹🇼</span>
+                </p>
+
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
                   <a
                     href="/DanielCoyleResumeSep2025.pdf"
                     download
@@ -175,61 +187,59 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex flex-col items-center" aria-label="Photo carousel">
-                <button
-                  type="button"
-                  onClick={() => setActivePhoto((current) => (current + 1) % photos.length)}
-                  aria-label={`Show next photo. Currently showing photo ${activePhoto + 1} of ${photos.length}`}
-                  className="relative h-64 w-52 cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-[#0d0d0f] sm:h-80 sm:w-64 md:h-[27rem] md:w-[22rem]"
-                >
-                  {photos.map((photo, photoIndex) => {
-                    const position = (photoIndex - activePhoto + photos.length) % photos.length;
-                    const positionClasses = [
-                      "z-30 translate-x-0 translate-y-0 rotate-0 scale-100 opacity-100",
-                      "z-20 translate-x-7 translate-y-3 rotate-3 scale-[.94] opacity-80",
-                      "z-10 -translate-x-7 translate-y-6 -rotate-3 scale-[.88] opacity-55",
-                      "z-0 translate-x-12 translate-y-9 rotate-6 scale-[.82] opacity-35",
-                    ];
+              <div className="relative z-0 flex shrink-0 justify-center">
+                <div className="flex flex-col items-center gap-3" aria-label="Photo carousel">
+                  <button
+                    type="button"
+                    onClick={() => setActivePhoto((current) => (current + 1) % photos.length)}
+                    aria-label={`Show next photo. Currently showing photo ${activePhoto + 1} of ${photos.length}`}
+                    className="relative h-[260px] w-[186px] cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-[#0f1115] md:h-[288px] md:w-[206px]"
+                  >
+                    {photos.map((photo, photoIndex) => {
+                      const position = (photoIndex - activePhoto + photos.length) % photos.length;
+                      const positionStyles = [
+                        { transform: "translate(0px, 0px) rotate(-1.5deg)",  zIndex: 40, opacity: 1 },
+                        { transform: "translate(10px, 6px) rotate(4deg)",    zIndex: 30, opacity: 0.92 },
+                        { transform: "translate(20px, 12px) rotate(9deg)",   zIndex: 20, opacity: 0.72 },
+                        { transform: "translate(30px, 18px) rotate(13.5deg)",zIndex: 10, opacity: 0.48 },
+                      ];
+                      const { transform, zIndex, opacity } = positionStyles[position];
 
-                    return (
-                      <img
-                        key={photo.src}
-                        src={photo.src}
-                        alt={photo.alt}
-                        style={{ objectPosition: photo.objectPosition }}
-                        className={`absolute inset-0 h-64 w-52 rounded-xl object-cover shadow-2xl sm:h-80 sm:w-64 md:h-[27rem] md:w-[22rem] ${positionClasses[position]}`}
-                      />
-                    );
-                  })}
-                </button>
+                      return (
+                        <div
+                          key={photo.src}
+                          style={{ transform, zIndex, opacity }}
+                          className="absolute inset-0 bg-[#f2ede6] px-[10px] pt-[10px] pb-[36px] shadow-[0_8px_32px_rgba(0,0,0,0.55),0_2px_6px_rgba(0,0,0,0.3)] transition-all duration-500 ease-[cubic-bezier(.4,0,.2,1)]"
+                        >
+                          <div className="h-full w-full overflow-hidden">
+                            <img
+                              src={photo.src}
+                              alt={photo.alt}
+                              style={{ objectPosition: photo.objectPosition }}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="w-full px-6">
-              <p className="mb-5 text-center text-[10px] uppercase tracking-[0.32em] text-gray-500">
-                Featured 
-              </p>
-              <FeaturedProjects />
-            </div>
           </section>
-          {/* Divider */}
-          <div className="flex justify-center my-6 px-6">
-            <div className="w-24 h-px bg-white/15" />
-          </div>
-
-          {/* About Me Section */}
+          {/* Projects Section */}
           <section
             id="projects"
-            className="scroll-mt-20 py-12 w-full max-w-6xl mx-auto px-6"
+            className={`scroll-mt-20 pt-1 pb-12 ${CONTAINER}`}
           >
-            <h2 className="text-2xl md:text-3xl font-bold mb-8">Projects</h2>
             <Projects />
           </section>
 
           {/* ── Experience Section ── */}
           <section
             id="experience"
-            className="scroll-mt-20 py-12 w-full max-w-6xl mx-auto px-6"
+            className={`scroll-mt-20 py-12 ${CONTAINER}`}
           >
             <h2 className="text-2xl md:text-3xl font-bold mb-8">Experience</h2>
             <Experience />
