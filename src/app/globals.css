@@ -8,11 +8,49 @@
   --foreground: #f4f6fa;
   --muted-foreground: #a8b0bf;
   --subtle-border: rgba(255, 255, 255, 0.14);
+  --accent-gold: #C9A227;
+  --accent-border: rgba(201, 162, 39, 0.4);
 }
 
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0; }
+}
+
+@keyframes wave {
+  0%   { transform: rotate(0deg); }
+  12%  { transform: rotate(14deg); }
+  24%  { transform: rotate(-8deg); }
+  36%  { transform: rotate(14deg); }
+  48%  { transform: rotate(-4deg); }
+  60%  { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes experience-pop {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes vote-confirm {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes click-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.035); }
+  100% { transform: scale(1); }
+}
+
+.wave-emoji {
+  display: inline-block;
+  transform-origin: 70% 70%;
+  cursor: default;
+}
+
+.wave-emoji:hover {
+  animation: wave 0.6s ease-in-out;
 }
 
 .scrollbar-hidden {
@@ -37,7 +75,7 @@ body {
   color: var(--foreground);
   margin: 0;
   padding: 0;
-  font-family: var(--font-geist-sans), sans-serif;
+  font-family: var(--font-plex-sans), sans-serif;
   overflow-x: hidden;
   position: relative;
 }
@@ -56,4 +94,8 @@ body {
 
 .border-subtle {
   border-color: var(--subtle-border);
+}
+
+.border-accent-subtle {
+  border-color: var(--accent-border);
 }

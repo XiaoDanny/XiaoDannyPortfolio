@@ -71,8 +71,13 @@ const projects: ProjectEntry[] = [
 const featuredProjects = projects.filter((project) => project.featured).slice(0, 2);
 
 function FeaturedProjectCard({ project }: { project: ProjectEntry }) {
+  const [showDetails, setShowDetails] = useState(false);
+
   return (
-    <article className="group relative h-[300px] w-full overflow-hidden rounded-[28px] border border-white/10 bg-[#131316] sm:h-[320px] lg:h-[340px]">
+    <article
+      onClick={() => setShowDetails((current) => !current)}
+      className="group relative aspect-[25/17] w-full cursor-pointer overflow-hidden rounded-[28px] border border-white/10 bg-[#131316] md:cursor-default"
+    >
       {project.image ? (
         <img
           src={project.image}
@@ -80,17 +85,23 @@ function FeaturedProjectCard({ project }: { project: ProjectEntry }) {
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.08] via-[#17171b] to-[#0d0d0f]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.12),transparent_45%),radial-gradient(circle_at_bottom_right,rgba(0,0,0,0.6),transparent_40%)]" />
-        </div>
+        <div className="absolute inset-0 bg-[#131316]" />
       )}
 
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-6 transition-opacity duration-300 group-hover:opacity-0">
+      <div
+        className={`absolute inset-x-0 bottom-0 flex flex-col gap-1 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-6 transition-opacity duration-300 group-hover:opacity-0 ${
+          showDetails ? "opacity-0" : ""
+        }`}
+      >
         <p className="text-[10px] uppercase tracking-[0.28em] text-white/70">{project.date}</p>
         <h3 className="text-2xl font-semibold text-white">{project.name}</h3>
       </div>
 
-      <div className="absolute inset-0 flex flex-col justify-end gap-4 bg-black/82 p-6 opacity-100 transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100">
+      <div
+        className={`absolute inset-0 flex flex-col justify-end gap-4 bg-black/[0.85] p-6 transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 ${
+          showDetails ? "opacity-100" : "opacity-0"
+        }`}
+      >
         <p className="text-sm leading-relaxed text-gray-300">{project.description}</p>
 
         <div className="flex items-center gap-3">
@@ -163,11 +174,18 @@ export default function Projects() {
   const [showAllProjects, setShowAllProjects] = useState(false);
 
   return (
-    <div className="mx-auto w-full max-w-[1236px]">
-      <div className="mb-8 text-left">
+    <div className="mx-auto w-full max-w-5xl">
+      <div className="mb-8 flex items-center justify-between gap-4">
         <h2 className="text-2xl font-bold text-white md:text-3xl">
           {showAllProjects ? "All" : "Featured"}
         </h2>
+        <button
+          type="button"
+          onClick={() => setShowAllProjects((current) => !current)}
+          className="shrink-0 rounded-full border border-white/15 bg-white/[0.03] px-5 py-2 text-xs uppercase tracking-[0.24em] text-gray-300 transition-colors hover:border-white/30 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        >
+          {showAllProjects ? "View Featured" : "View All Projects"}
+        </button>
       </div>
 
       {showAllProjects ? (
@@ -183,16 +201,6 @@ export default function Projects() {
           ))}
         </div>
       )}
-
-      <div className="mt-8 flex justify-center">
-        <button
-          type="button"
-          onClick={() => setShowAllProjects((current) => !current)}
-          className="rounded-full border border-white/15 bg-white/[0.03] px-5 py-2 text-xs uppercase tracking-[0.24em] text-gray-300 transition-colors hover:border-white/30 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-        >
-          {showAllProjects ? "View Featured" : "View All Projects"}
-        </button>
-      </div>
     </div>
   );
 }

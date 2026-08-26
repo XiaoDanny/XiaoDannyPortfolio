@@ -1,10 +1,10 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Space_Grotesk } from "next/font/google";
+import { Geist_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-geist-sans",
+const ibmPlexSans = IBM_Plex_Sans({
+  variable: "--font-plex-sans",
   subsets: ["latin"],
 });
 
@@ -30,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${spaceGrotesk.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${ibmPlexSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>

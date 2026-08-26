@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // ─── To add a new experience, push an object to ENTRIES ──────────────────────
 // Order: newest first (top of tree) → oldest last (near roots)
@@ -47,18 +47,26 @@ const ENTRIES: Entry[] = [
   },
 ];
 
-// ─── Layout — all positions auto-derive from ENTRIES.length ──────────────────
-const CW      = 580;  // canvas width
-const CX      = 290;  // trunk center x
-const TOP_PAD = 80;   // canopy space above first node
-const SPACING = 172;  // vertical gap between nodes
-const BOT_PAD = 130;  // roots space below last node
-const BRANCH  = 96;   // horizontal arm from trunk to branch tip
-const CARD_W  = 174;  // card width
-const NODE_R  = 7;    // node dot radius
+const NODE_R = 7; // node dot radius
 
-// Canvas height grows automatically with each new entry
-const CH = TOP_PAD + ENTRIES.length * SPACING + BOT_PAD;
+// Peak positions on mountainRange.png, as % of the image's width/height, left → right
+// (exact tips found by scanning the actual asset for each region's topmost silhouette pixel)
+const PEAKS: { x: number; y: number }[] = [
+  { x: 15.22, y: 46.15 },
+  { x: 34.61, y: 45.59 },
+  { x: 47.78, y: 38.99 },
+  { x: 68.99, y: 47.93 },
+  { x: 87.69, y: 43.46 },
+];
+
+// Evenly spread `count` entries across the available peaks, always hitting real tips
+function pickPeaks(count: number) {
+  if (count <= 1) return [PEAKS[Math.floor(PEAKS.length / 2)]];
+  return Array.from({ length: count }, (_, i) => {
+    const idx = Math.round((i * (PEAKS.length - 1)) / (count - 1));
+    return PEAKS[idx];
+  });
+}
 
 const ACCENT: Record<EntryType, string> = {
   work:      "rgba(99,102,241,1)",
@@ -71,64 +79,50 @@ const ACCENT_GLOW: Record<EntryType, string> = {
   other:     "rgba(16,185,129,0.35)",
 };
 
-// ─── Main component ───────────────────────────────────────────────────────────
-export default function Experience() {
-  const [active, setActive] = useState<number | null>(null);
-
+// ─── Mobile — single-column left-rail timeline (avoids the wide tree canvas) ──
+function MobileTimeline({
+  active,
+  setActive,
+}: {
+  active: number | null;
+  setActive: (i: number | null) => void;
+}) {
   return (
-    <div className="flex justify-center overflow-x-auto scrollbar-hidden">
-      <div className="relative flex-shrink-0" style={{ width: CW, height: CH }}>
-
-        {/* Tree illustration */}
-        <TreeSVG active={active} />
-
+    <div className="relative lg:hidden">
+      <div className="absolute bottom-2 left-[15px] top-2 w-px bg-white/10" />
+      <div className="flex flex-col gap-5">
         {ENTRIES.map((entry, i) => {
-          const nodeY    = TOP_PAD + i * SPACING;
-          const side     = i % 2 === 0 ? "right" : "left";
           const isActive = active === i;
-          const color    = ACCENT[entry.type];
-          const glow     = ACCENT_GLOW[entry.type];
-
-          const cardLeft = side === "right"
-            ? CX + BRANCH + 14
-            : CX - BRANCH - 14 - CARD_W;
+          const color = ACCENT[entry.type];
+          const glow = ACCENT_GLOW[entry.type];
 
           return (
-            <div key={entry.company}>
-
-              {/* Node — click target + visual dot */}
+            <div key={entry.company} className="relative flex gap-4">
               <button
                 onClick={() => setActive(isActive ? null : i)}
-                className="absolute z-20 flex items-center justify-center rounded-full
+                className="relative z-10 mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full
                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white
                            focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]"
-                style={{ left: CX - 16, top: nodeY - 16, width: 32, height: 32 }}
                 aria-label={isActive ? `Collapse ${entry.company}` : `Expand ${entry.company}`}
               >
                 <span
                   className="block rounded-full transition-all duration-300"
                   style={{
-                    width:      NODE_R * 2,
-                    height:     NODE_R * 2,
+                    width: NODE_R * 2,
+                    height: NODE_R * 2,
                     background: isActive ? color : "rgba(255,255,255,0.28)",
-                    boxShadow:  isActive ? `0 0 14px 5px ${glow}` : "none",
+                    boxShadow: isActive ? `0 0 14px 5px ${glow}` : "none",
                   }}
                 />
               </button>
 
-              {/* Entry card */}
-              <div
-                className={`absolute z-10 transition-all duration-200 ${
-                  isActive ? "opacity-100" : "opacity-55 hover:opacity-85"
-                }`}
-                style={{ top: nodeY - 30, left: cardLeft, width: CARD_W }}
-              >
+              <div className="min-w-0 flex-1 pb-1">
                 <button
                   onClick={() => setActive(isActive ? null : i)}
                   className={`w-full text-left rounded-xl border p-3 transition-all duration-200 ${
                     isActive
-                      ? "border-white/20 bg-[#161b24]/90 backdrop-blur-sm shadow-[0_8px_28px_rgba(0,0,0,0.55)]"
-                      : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"
+                      ? "animate-[experience-pop_300ms_ease-out] border-white/20"
+                      : "border-white/10 bg-white/[0.03] active:bg-white/[0.05]"
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
@@ -166,153 +160,157 @@ export default function Experience() {
   );
 }
 
-// ─── Tree SVG ─────────────────────────────────────────────────────────────────
-interface TreeSVGProps { active: number | null; }
+// Strips the image's own background via flood fill (sampling the actual corner color) so it
+// blends seamlessly with whatever sits behind it, instead of showing a mismatched color box
+function TransparentImage({ src, className }: { src: string; className?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-function TreeSVG({ active }: TreeSVGProps) {
-  const trunkBase = CH - BOT_PAD * 0.45;
-  const trunkTop  = TOP_PAD - 14;
-  const th        = trunkBase - trunkTop;
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d", { willReadFrequently: true });
+    if (!canvas || !ctx) return;
 
-  // ── Wide tapered trunk — 28px at base, 4px at top ──
-  const trunk = [
-    `M ${CX - 14},${trunkBase}`,
-    `C ${CX - 11},${trunkBase - th * 0.28} ${CX - 5},${trunkBase - th * 0.62} ${CX - 2},${trunkTop}`,
-    `L ${CX + 2},${trunkTop}`,
-    `C ${CX + 5},${trunkBase - th * 0.62} ${CX + 11},${trunkBase - th * 0.28} ${CX + 14},${trunkBase}`,
-    "Z",
-  ].join(" ");
+    const img = new Image();
+    img.src = src;
+    img.onload = () => {
+      const { naturalWidth: width, naturalHeight: height } = img;
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img, 0, 0);
 
-  // ── Roots — spread outward and DOWNWARD along the ground ──
-  const rb = trunkBase;
-  const roots = [
-    `M ${CX-8},${rb}    C ${CX-26},${rb+10} ${CX-60},${rb+18} ${CX-96},${rb+20}`,
-    `M ${CX+8},${rb}    C ${CX+26},${rb+10} ${CX+60},${rb+18} ${CX+96},${rb+20}`,
-    `M ${CX-5},${rb+6}  C ${CX-18},${rb+14} ${CX-42},${rb+20} ${CX-68},${rb+22}`,
-    `M ${CX+5},${rb+6}  C ${CX+18},${rb+14} ${CX+42},${rb+20} ${CX+68},${rb+22}`,
-    `M ${CX-3},${rb+12} C ${CX-8}, ${rb+18} ${CX-22},${rb+22} ${CX-36},${rb+24}`,
-    `M ${CX+3},${rb+12} C ${CX+8}, ${rb+18} ${CX+22},${rb+22} ${CX+36},${rb+24}`,
-  ];
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const { data } = imageData;
+      const [bgR, bgG, bgB] = [data[0], data[1], data[2]]; // top-left corner = background color
+      const isBackground = (i: number) =>
+        Math.abs(data[i] - bgR) + Math.abs(data[i + 1] - bgG) + Math.abs(data[i + 2] - bgB) < 30;
 
-  // ── Canopy: ellipse blob + upward branch lines going into it ──
-  const ct = trunkTop + 2;
-  const blobCY = ct - 24;
-  const canopyBranches = [
-    `M ${CX},${ct+12} C ${CX-30},${ct+2}  ${CX-54},${ct-6}  ${CX-60},${ct-16}`,
-    `M ${CX},${ct+12} C ${CX+30},${ct+2}  ${CX+54},${ct-6}  ${CX+60},${ct-16}`,
-    `M ${CX},${ct+6}  C ${CX-16},${ct-2}  ${CX-30},${ct-12} ${CX-36},${ct-26}`,
-    `M ${CX},${ct+6}  C ${CX+16},${ct-2}  ${CX+30},${ct-12} ${CX+36},${ct-26}`,
-    `M ${CX},${ct+4}  C ${CX-6}, ${ct-10} ${CX-10},${ct-22} ${CX-8}, ${ct-34}`,
-    `M ${CX},${ct+4}  C ${CX+6}, ${ct-10} ${CX+10},${ct-22} ${CX+8}, ${ct-34}`,
-  ];
+      // Flood fill from the border inward so only the connected background is removed
+      const visited = new Uint8Array(width * height);
+      const stack: number[] = [];
+      for (let x = 0; x < width; x++) stack.push(x, x + (height - 1) * width);
+      for (let y = 0; y < height; y++) stack.push(y * width, y * width + (width - 1));
 
-  // ── Filler branches between nodes — simple upward arcs with Y-forks ──
-  const fillers: string[] = [];
-  for (let i = 0; i < ENTRIES.length - 1; i++) {
-    const midY = (TOP_PAD + i * SPACING + TOP_PAD + (i + 1) * SPACING) / 2;
-    const tipY = midY - 36;
-    fillers.push(`M ${CX},${midY}   C ${CX-16},${midY-18} ${CX-36},${midY-28} ${CX-46},${tipY}`);
-    fillers.push(`M ${CX-46},${tipY} C ${CX-52},${tipY-12} ${CX-58},${tipY-14} ${CX-56},${tipY-6}`);
-    fillers.push(`M ${CX-46},${tipY} C ${CX-40},${tipY-12} ${CX-36},${tipY-14} ${CX-34},${tipY-6}`);
-    fillers.push(`M ${CX},${midY}   C ${CX+16},${midY-18} ${CX+36},${midY-28} ${CX+46},${tipY}`);
-    fillers.push(`M ${CX+46},${tipY} C ${CX+52},${tipY-12} ${CX+58},${tipY-14} ${CX+56},${tipY-6}`);
-    fillers.push(`M ${CX+46},${tipY} C ${CX+40},${tipY-12} ${CX+36},${tipY-14} ${CX+34},${tipY-6}`);
-  }
+      while (stack.length) {
+        const p = stack.pop()!;
+        if (visited[p]) continue;
+        visited[p] = 1;
+        const i = p * 4;
+        if (!isBackground(i)) continue;
+        data[i + 3] = 0;
+        const x = p % width;
+        const y = (p - x) / width;
+        if (x > 0) stack.push(p - 1);
+        if (x < width - 1) stack.push(p + 1);
+        if (y > 0) stack.push(p - width);
+        if (y < height - 1) stack.push(p + width);
+      }
 
-  // ── Entry branch sub-twigs — angle clearly upward ──
-  const twigs: string[] = [];
-  for (let i = 0; i < ENTRIES.length; i++) {
-    const nodeY = TOP_PAD + i * SPACING;
-    const dir   = i % 2 === 0 ? 1 : -1;
-    const endX  = CX + dir * BRANCH;
-    const endY  = nodeY - 16;
-    twigs.push(`M ${endX},${endY} C ${endX+dir*10},${endY-16} ${endX+dir*20},${endY-20} ${endX+dir*22},${endY-14}`);
-    twigs.push(`M ${endX},${endY} C ${endX+dir*8}, ${endY-4}  ${endX+dir*18},${endY-6}  ${endX+dir*20},${endY-14}`);
-  }
+      ctx.putImageData(imageData, 0, 0);
+    };
+  }, [src]);
 
-  // ── Leaf dots — tight clusters only at tips ──
-  const leaves: [number, number, number][] = [
-    [CX-60, ct-16, 1.8], [CX-48, ct-26, 2.0], [CX-32, ct-34, 2.2],
-    [CX-12, ct-38, 2.0], [CX,    ct-42, 2.4], [CX+12, ct-38, 2.0],
-    [CX+32, ct-34, 2.2], [CX+48, ct-26, 2.0], [CX+60, ct-16, 1.8],
-    [CX-20, ct-28, 1.6], [CX+20, ct-28, 1.6], [CX-6,  ct-30, 1.8], [CX+6, ct-30, 1.8],
-    ...ENTRIES.flatMap((_, i): [number, number, number][] => {
-      const endY = TOP_PAD + i * SPACING - 16;
-      const d    = i % 2 === 0 ? 1 : -1;
-      const ex   = CX + d * BRANCH;
-      return [[ex+d*22, endY-14, 1.8], [ex+d*20, endY-6, 1.6], [ex+d*20, endY+2, 1.5]];
-    }),
-    ...Array.from({ length: ENTRIES.length - 1 }, (_, i): [number, number, number][] => {
-      const midY = (TOP_PAD + i * SPACING + TOP_PAD + (i+1) * SPACING) / 2;
-      const ty   = midY - 38;
-      return [[CX-56, ty, 1.5], [CX-44, ty-6, 1.4], [CX+56, ty, 1.5], [CX+44, ty-6, 1.4]];
-    }).flat(),
-  ];
+  return <canvas ref={canvasRef} aria-hidden="true" className={className} />;
+}
+
+// ─── Desktop — horizontal mountain range, entries sit on the peaks ────────────
+function MountainTimeline({
+  active,
+  setActive,
+}: {
+  active: number | null;
+  setActive: (i: number | null) => void;
+}) {
+  // Left → right reads oldest → newest, so reverse the newest-first ENTRIES order
+  const timeline = [...ENTRIES].reverse();
+  const peaks = pickPeaks(timeline.length);
 
   return (
-    <svg
-      className="pointer-events-none absolute inset-0 h-full w-full"
-      viewBox={`0 0 ${CW} ${CH}`}
-      aria-hidden="true"
-    >
-      {/* Roots — go down and out, like surface roots */}
-      {roots.map((d, i) => (
-        <path key={`r${i}`} d={d} fill="none"
-          stroke="rgba(255,255,255,0.11)"
-          strokeWidth={i < 2 ? "1.8" : i < 4 ? "1.3" : "1.0"}
-          strokeLinecap="round"
-        />
-      ))}
+    <div className="relative mx-auto mt-20 hidden aspect-[1755/896] w-full lg:block">
+      <TransparentImage
+        src="/Images/mountainRange.png"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
 
-      {/* Trunk */}
-      <path d={trunk} fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.16)" strokeWidth="0.5" />
+      {timeline.map((entry, i) => {
+        const originalIndex = ENTRIES.length - 1 - i;
+        const isActive       = active === originalIndex;
+        const color          = ACCENT[entry.type];
+        const { x, y }       = peaks[i];
+        const stemHeight     = isActive ? 112 : 44;
 
-      {/* Knot bumps */}
-      {ENTRIES.map((_, i) => {
-        const nodeY = TOP_PAD + i * SPACING;
-        const prop  = (nodeY - trunkTop) / th;
-        const rx    = Math.round(14 - prop * 12) + 3;
-        return <ellipse key={`k${i}`} cx={CX} cy={nodeY} rx={rx} ry={4} fill="rgba(255,255,255,0.05)" />;
-      })}
-
-      {/* Filler branches */}
-      {fillers.map((d, i) => (
-        <path key={`f${i}`} d={d} fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth="0.9" strokeLinecap="round" />
-      ))}
-
-      {/* Entry branches */}
-      {ENTRIES.map((_, i) => {
-        const nodeY    = TOP_PAD + i * SPACING;
-        const dir      = i % 2 === 0 ? 1 : -1;
-        const endX     = CX + dir * BRANCH;
-        const endY     = nodeY - 16;
-        const isActive = active === i;
-        const d = `M ${CX},${nodeY} C ${CX+dir*42},${nodeY-28} ${endX-dir*12},${endY-8} ${endX},${endY}`;
         return (
-          <path key={`b${i}`} d={d} fill="none"
-            stroke={isActive ? "rgba(255,255,255,0.38)" : "rgba(255,255,255,0.16)"}
-            strokeWidth={isActive ? 2.2 : 1.8}
-            strokeLinecap="round"
-          />
+          <div key={entry.company} className="absolute" style={{ left: `${x}%`, top: `${y}%` }}>
+            {/* Stem — grows taller & accent-colored when expanded, rooted exactly at the peak tip */}
+            <div
+              className="absolute bottom-0 left-1/2 w-px -translate-x-1/2 transition-all duration-300"
+              style={{ height: stemHeight, background: isActive ? color : "rgba(255,255,255,0.3)" }}
+            />
+
+            {/* Invisible click target — the peak itself is the node, no dot needed */}
+            <button
+              onClick={() => setActive(isActive ? null : originalIndex)}
+              className="absolute z-20 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white
+                         focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]"
+              aria-label={isActive ? `Collapse ${entry.company}` : `Expand ${entry.company}`}
+            />
+
+            {/* Pill (collapsed) or card (expanded), floating above the stem */}
+            <div
+              className="absolute left-1/2 -translate-x-1/2 transition-[bottom] duration-300 ease-out"
+              style={{
+                bottom: stemHeight + 8,
+              }}
+            >
+              {isActive ? (
+                <div className="w-64 animate-[experience-pop_300ms_ease-out] rounded-xl border border-white/20 p-4 text-left">
+                  <div className="flex items-center gap-2.5">
+                    <img
+                      src={entry.image}
+                      alt={entry.company}
+                      className="h-8 w-8 flex-shrink-0 rounded-lg object-cover border border-white/10 bg-black/20"
+                    />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-white truncate">{entry.company}</p>
+                      <p className="text-[11px] text-gray-400 truncate">{entry.role}</p>
+                    </div>
+                  </div>
+                  <p className="mt-2 text-[10px] font-medium" style={{ color }}>{entry.date}</p>
+                  <p className="mt-2 text-[11px] leading-relaxed text-gray-400">{entry.description}</p>
+                  <a
+                    href={entry.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 flex items-center gap-1 text-[10px] text-gray-500 transition-colors hover:text-white"
+                  >
+                    Visit site ↗
+                  </a>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setActive(originalIndex)}
+                  className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-white/10 bg-[#131316]/90 px-3 py-1.5 text-[11px] font-medium leading-none text-gray-300 shadow-md transition-colors hover:border-white/25 hover:text-white"
+                >
+                  <img src={entry.image} alt="" className="h-4 w-4 flex-shrink-0 rounded-full object-cover" />
+                  <span>{entry.company}</span>
+                </button>
+              )}
+            </div>
+          </div>
         );
       })}
+    </div>
+  );
+}
 
-      {/* Sub-twigs */}
-      {twigs.map((d, i) => (
-        <path key={`t${i}`} d={d} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="0.9" strokeLinecap="round" />
-      ))}
+// ─── Main component ───────────────────────────────────────────────────────────
+export default function Experience() {
+  const [active, setActive] = useState<number | null>(null);
 
-      {/* Canopy: translucent blob + branches */}
-      <ellipse cx={CX} cy={blobCY} rx={74} ry={36}
-        fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
-      {canopyBranches.map((d, i) => (
-        <path key={`c${i}`} d={d} fill="none" stroke="rgba(255,255,255,0.11)" strokeWidth="1.1" strokeLinecap="round" />
-      ))}
-
-      {/* Leaf dots */}
-      {leaves.map(([lx, ly, r], i) => (
-        <circle key={`l${i}`} cx={lx} cy={ly} r={r} fill="rgba(255,255,255,0.12)" />
-      ))}
-    </svg>
+  return (
+    <>
+      <MobileTimeline active={active} setActive={setActive} />
+      <MountainTimeline active={active} setActive={setActive} />
+    </>
   );
 }
