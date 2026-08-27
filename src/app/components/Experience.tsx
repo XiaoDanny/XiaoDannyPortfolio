@@ -212,6 +212,57 @@ function TransparentImage({ src, className }: { src: string; className?: string 
   return <canvas ref={canvasRef} aria-hidden="true" className={className} />;
 }
 
+// Tiny, low-opacity stars scattered above the peaks — irregular spacing (not a grid), a few
+// left un-lit in each gap, with some given a slow/staggered twinkle for a natural feel
+const STARS: { x: number; y: number; r: number; o: number; twinkle?: { duration: number; delay: number } }[] = [
+  { x: 6,  y: 14, r: 0.16, o: 0.22 },
+  { x: 13, y: 27, r: 0.13, o: 0.16, twinkle: { duration: 4.2, delay: 0.4 } },
+  { x: 24, y: 7,  r: 0.15, o: 0.2 },
+  { x: 31, y: 19, r: 0.12, o: 0.14 },
+  { x: 44, y: 11, r: 0.17, o: 0.24, twinkle: { duration: 5.6, delay: 1.6 } },
+  { x: 49, y: 29, r: 0.11, o: 0.13 },
+  { x: 59, y: 6,  r: 0.16, o: 0.22 },
+  { x: 68, y: 17, r: 0.13, o: 0.18, twinkle: { duration: 4.8, delay: 2.4 } },
+  { x: 77, y: 9,  r: 0.15, o: 0.2 },
+  { x: 85, y: 23, r: 0.12, o: 0.15 },
+  { x: 95, y: 12, r: 0.14, o: 0.19, twinkle: { duration: 5.1, delay: 0.9 } },
+];
+
+// Stars only — rendered behind the mountain image so they read through its transparent
+// sky, with no fill/backdrop of their own so the global page background stays untouched.
+// Each star is a tiny core dot plus a faint cross of rays so it reads as a star, not a dot.
+function SkyDecorations() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      className="absolute inset-0 z-0 h-full w-full"
+    >
+      {STARS.map((star, i) => {
+        const rayLength = star.r * 2.4;
+        return (
+          <g
+            key={i}
+            style={star.twinkle ? {
+              animation: `star-twinkle ${star.twinkle.duration}s ease-in-out infinite`,
+              animationDelay: `${star.twinkle.delay}s`,
+            } : undefined}
+          >
+            <path
+              d={`M ${star.x} ${star.y - rayLength} V ${star.y + rayLength} M ${star.x - rayLength} ${star.y} H ${star.x + rayLength}`}
+              stroke={`rgba(255,255,255,${star.o * 0.55})`}
+              strokeWidth={star.r * 0.4}
+              strokeLinecap="round"
+            />
+            <circle cx={star.x} cy={star.y} r={star.r} fill={`rgba(255,255,255,${star.o})`} />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 // ─── Desktop — horizontal mountain range, entries sit on the peaks ────────────
 function MountainTimeline({
   active,
@@ -226,11 +277,18 @@ function MountainTimeline({
 
   return (
     <div className="relative mx-auto mt-20 hidden aspect-[1755/896] w-full lg:block">
-      <TransparentImage
-        src="/Images/mountainRange.png"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
+      {/* Background layer — stars + mountain, isolated into their own stacking context so
+          nothing in here can ever paint above the foreground content layer below */}
+      <div className="absolute inset-0 z-0" style={{ isolation: "isolate" }}>
+        <SkyDecorations />
+        <TransparentImage
+          src="/Images/mountainRange.png"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      </div>
 
+      {/* Foreground layer — all experience content, definitively above the background layer */}
+      <div className="absolute inset-0 z-10" style={{ isolation: "isolate" }}>
       {timeline.map((entry, i) => {
         const originalIndex = ENTRIES.length - 1 - i;
         const isActive       = active === originalIndex;
@@ -239,21 +297,29 @@ function MountainTimeline({
         const stemHeight     = isActive ? 112 : 44;
 
         return (
-          <div key={entry.company} className="absolute" style={{ left: `${x}%`, top: `${y}%` }}>
+          <div
+            key={entry.company}
+            className="absolute"
+            style={{ left: `${x}%`, top: `${y}%` }}
+          >
             {/* Stem — grows taller & accent-colored when expanded, rooted exactly at the peak tip */}
             <div
               className="absolute bottom-0 left-1/2 w-px -translate-x-1/2 transition-all duration-300"
               style={{ height: stemHeight, background: isActive ? color : "rgba(255,255,255,0.3)" }}
             />
 
-            {/* Invisible click target — the peak itself is the node, no dot needed */}
-            <button
-              onClick={() => setActive(isActive ? null : originalIndex)}
-              className="absolute z-20 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white
-                         focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]"
-              aria-label={isActive ? `Collapse ${entry.company}` : `Expand ${entry.company}`}
-            />
+            {/* Widened invisible hit target over the stem — clicking the line collapses the card */}
+            {isActive && (
+              <button
+                type="button"
+                onClick={() => setActive(null)}
+                className="absolute bottom-0 left-1/2 z-20 w-6 -translate-x-1/2 cursor-pointer
+                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white
+                           focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]"
+                style={{ height: stemHeight }}
+                aria-label={`Collapse ${entry.company}`}
+              />
+            )}
 
             {/* Pill (collapsed) or card (expanded), floating above the stem */}
             <div
@@ -263,7 +329,7 @@ function MountainTimeline({
               }}
             >
               {isActive ? (
-                <div className="w-64 animate-[experience-pop_300ms_ease-out] rounded-xl border border-white/20 p-4 text-left">
+                <div className="w-64 animate-[experience-pop_300ms_ease-out] rounded-xl border border-white/10 bg-white/[0.03] p-4 text-left">
                   <div className="flex items-center gap-2.5">
                     <img
                       src={entry.image}
@@ -299,6 +365,7 @@ function MountainTimeline({
           </div>
         );
       })}
+      </div>
     </div>
   );
 }

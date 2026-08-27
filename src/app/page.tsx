@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Projects from "./components/Projects";
 import Experience from "./components/Experience";
+import { getGithubActivity, type GithubActivity } from "./lib/githubActivity";
 
 const photos = [
   { src: "/Images/BeyondTheCode/Daniel1.jpg", alt: "Daniel Coyle", objectPosition: "center 35%" },
@@ -167,12 +168,22 @@ function TypeRacerWidget() {
     setElapsed(0);
     setSiteRecord(100);
     setNewRecord(false);
-    inputRef.current?.focus();
   }
 
   return (
-    <div className="flex h-[260px] min-h-[260px] flex-col rounded-xl border border-white/10 bg-canvas p-4 text-left">
-      <div className="flex min-h-[88px] items-center justify-between gap-3">
+    <div className="relative flex h-[260px] min-h-[260px] flex-col rounded-xl border border-white/10 bg-canvas p-4 text-left">
+      <button
+        type="button"
+        onClick={nextSentence}
+        aria-label="Skip to the next sentence"
+        title="Next Sentence"
+        className="absolute right-3 top-3 z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="1.8">
+          <path d="M20 5v5h-5M20 10a8 8 0 1 0 2 5.3" />
+        </svg>
+      </button>
+      <div className="flex min-h-[88px] items-center pr-10">
         <div className="break-words whitespace-pre-wrap font-mono text-sm leading-relaxed tracking-wide text-gray-300">
           {raceText.split("").map((character, index) => {
             const typedCharacter = typed[index];
@@ -185,11 +196,6 @@ function TypeRacerWidget() {
             return <span key={`${character}-${index}`} className={`${color} transition-colors duration-100 ${isCurrent ? "border-l border-white pl-px" : ""}`}>{character}</span>;
           })}
         </div>
-        <button type="button" onClick={nextSentence} aria-label="Skip to the next sentence" title="Next Sentence" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
-          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="1.8">
-            <path d="M20 5v5h-5M20 10a8 8 0 1 0 2 5.3" />
-          </svg>
-        </button>
       </div>
       <div className="flex flex-1 items-center">
         <input
@@ -275,72 +281,82 @@ function ClickMeWidget() {
   );
 }
 
-type VotingSong = { id: number; title: string; votes: number };
+function CommitIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="1.8">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M4 12h5M15 12h5" />
+    </svg>
+  );
+}
 
-function SongVotingWidget() {
-  const [songs, setSongs] = useState<VotingSong[]>([]);
-  const [votedFor, setVotedFor] = useState<number | null>(null);
+function GithubIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+      <path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.5-1.4-1.3-1.7-1.3-1.7-1.1-.8.1-.8.1-.8 1.2.1 1.8 1.3 1.8 1.3 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.3-3.2-.1-.3-.6-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0C17.5 5.3 18.5 5.6 18.5 5.6c.7 1.6.2 2.9.1 3.2.8.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.4.3.8 1 .8 2v3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z" />
+    </svg>
+  );
+}
 
-  useEffect(() => {
-    fetch("/api/beyond-stats")
-      .then((response) => response.json())
-      .then((data: { songs: VotingSong[] }) => setSongs(data.songs))
-      .catch(() => undefined);
-    const storedVote = document.cookie
-      .split("; ")
-      .find((cookie) => cookie.startsWith("beyond-vote="))
-      ?.split("=")[1];
-    if (storedVote) setVotedFor(Number(storedVote));
-  }, []);
-
-  function vote(songId: number) {
-    setVotedFor(songId);
-    document.cookie = `beyond-vote=${songId}; max-age=31536000; path=/; samesite=lax`;
-    setSongs((current) => current.map((song) => {
-      if (song.id === songId) return { ...song, votes: song.votes + 1 };
-      if (song.id === votedFor && song.votes > 0) return { ...song, votes: song.votes - 1 };
-      return song;
-    }));
-    fetch("/api/beyond-stats", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "vote", songId, previousSongId: votedFor }),
-    }).catch(() => undefined);
-  }
-
-  const leader = songs.reduce<VotingSong | null>((current, song) => !current || song.votes > current.votes ? song : current, null);
-
+// Purely presentational — every value it renders comes in as props, so the data
+// source (static snapshot today, a live fetch later) can change without touching this.
+function RecentCommitsWidget({ repoName, repoUrl, commits, languages, languageTimeframeLabel }: GithubActivity) {
   return (
     <div className="col-span-2 flex h-full min-h-[220px] flex-col rounded-xl border border-white/10 bg-canvas p-4 text-left lg:col-span-2 lg:mt-[23px] lg:h-[306px]">
-      <div className="flex items-center justify-between gap-4">
-        <h3 className="text-sm font-semibold text-white">What Should I Play Next?</h3>
-        <span className="max-w-[45%] truncate text-right text-[10px] uppercase tracking-[0.12em] text-gray-500">
-          Leading: {leader?.title ?? "--"}
-        </span>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <CommitIcon />
+          <h3 className="text-sm font-semibold text-white">Recent Commits</h3>
+        </div>
+        <a
+          href="https://github.com/XiaoDanny"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open GitHub profile"
+          title="GitHub"
+          className="text-gray-500 transition-colors hover:text-white"
+        >
+          <GithubIcon />
+        </a>
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        {songs.map((song) => (
-          <button
-            type="button"
-            key={song.id}
-            onClick={() => vote(song.id)}
-            className={`flex w-full items-center justify-between gap-2 rounded-md border px-3 py-2 text-left text-xs transition-colors ${votedFor === song.id ? "border-emerald-400/50 text-white" : "border-white/10 text-gray-300 hover:border-white/30"}`}
-          >
-            <span className="min-w-0 truncate">{song.title}</span>
-            <span className="text-gray-500">{song.votes} vote{song.votes === 1 ? "" : "s"}</span>
-          </button>
+
+      <ul className="mt-3 space-y-1.5">
+        {commits.map((commit) => (
+          <li key={commit.hash}>
+            <a
+              href={`${repoUrl}/commit/${commit.hash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center justify-between gap-3 rounded-md px-1 py-1 text-xs transition-colors hover:bg-white/5"
+            >
+              <p className="min-w-0 truncate text-gray-300 group-hover:text-white">
+                <span className="font-semibold text-white">{repoName}</span>
+                <span className="text-gray-600"> · </span>
+                <span className="truncate">{commit.message}</span>
+              </p>
+              <span className="shrink-0 whitespace-nowrap text-[10px] tabular-nums">
+                <span className="text-emerald-400/80">+{commit.additions}</span>{" "}
+                <span className="text-red-400/70">-{commit.deletions}</span>
+              </span>
+            </a>
+          </li>
         ))}
-      </div>
+      </ul>
+
       <div className="mt-auto border-t border-white/10 pt-3">
-        <p className="text-[10px] uppercase tracking-[0.18em] text-gray-500">🎹 Currently Playing</p>
-        <p className="mt-1 text-xs text-gray-300">Canon in D</p>
+        <p className="text-[9px] uppercase tracking-[0.14em] text-gray-600">{languageTimeframeLabel}</p>
+        <div className="mt-2 space-y-1.5">
+          {languages.map((lang) => (
+            <div key={lang.name} className="flex items-center gap-2 text-[10px] text-gray-400">
+              <span className="w-[68px] shrink-0 truncate text-gray-300">{lang.name}</span>
+              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
+                <div className="h-full rounded-full bg-white/70" style={{ width: `${lang.pct}%` }} />
+              </div>
+              <span className="w-8 shrink-0 text-right tabular-nums text-gray-500">{lang.pct}%</span>
+            </div>
+          ))}
+        </div>
       </div>
-      {songs.length > 0 && votedFor !== null && (
-        <p className="mt-3 animate-[vote-confirm_220ms_ease-out] text-[10px] text-gray-500">
-          ✓ You voted for {songs.find((song) => song.id === votedFor)?.title ?? "a song"}
-          <span className="ml-2 text-gray-600">Click another to change</span>
-        </p>
-      )}
     </div>
   );
 }
@@ -443,12 +459,14 @@ function PianoVideoQuadrant() {
 }
 
 function BeyondSection() {
+  const githubActivity = getGithubActivity();
+
   return (
     <section id="beyond" className="scroll-mt-20 pb-12 pt-4">
       <div className={`${"mx-auto w-full max-w-6xl px-6"}`}>
         <div className="grid grid-cols-2 items-stretch gap-4 lg:grid-cols-4">
           <PianoVideoQuadrant />
-          <SongVotingWidget />
+          <RecentCommitsWidget {...githubActivity} />
           <div className="col-span-1 lg:col-span-2"><TypeRacerWidget /></div>
           <ClickMeWidget />
           <WeatherWidget />
@@ -580,7 +598,7 @@ export default function Home() {
             <div className="relative mx-auto flex w-full max-w-5xl flex-col items-center gap-6 lg:flex-row lg:items-center lg:gap-10">
               <div className="w-full text-left lg:w-auto">
                 <h1 className="whitespace-nowrap text-[2.35rem] font-semibold tracking-[-0.05em] text-white md:text-[3.1rem] xl:text-[3.8rem]">
-                  Hi <span aria-hidden="true" className="wave-emoji">👋</span>, I&rsquo;m Daniel
+                  Hi, I&rsquo;m Daniel
                 </h1>
 
                 <p className="mx-auto mt-2 inline-flex items-center gap-2 whitespace-nowrap text-base font-normal leading-relaxed text-gray-200 md:text-[1.1rem] lg:mx-0">
@@ -597,7 +615,7 @@ export default function Home() {
                 </p>
 
                 <p className="mx-auto mt-2 inline-flex items-center gap-1.5 whitespace-nowrap text-base font-normal leading-relaxed text-gray-200 md:text-[1.1rem] lg:mx-0">
-                  <span>Based in Birmingham, Alabama</span>
+                  <span>based in Birmingham, Alabama</span>
                   <span aria-hidden="true">📍</span>
                   <UsFlagIcon aria-label="United States" />
                   <TwFlagIcon aria-label="Taiwan" />

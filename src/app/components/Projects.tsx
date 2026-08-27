@@ -138,34 +138,39 @@ function FeaturedProjectCard({ project }: { project: ProjectEntry }) {
 function AllProjectCard({ project }: { project: ProjectEntry }) {
   return (
     <article className="group relative mx-auto flex h-[300px] w-full max-w-[342px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-colors hover:bg-white/[0.06] sm:h-[320px] lg:h-[320px] lg:max-w-[380px]">
-      <h3 className="text-lg font-semibold text-white">{project.name}</h3>
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="text-lg font-semibold text-white">{project.name}</h3>
+
+        {project.githubUrl && project.githubUrl !== "#" && (
+          <a
+            href={project.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`View ${project.name} on GitHub`}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
+            <img src="/Images/Image3.svg" alt="" className="h-4 w-4 invert" />
+          </a>
+        )}
+      </div>
 
       <p className="mt-3 text-sm leading-relaxed text-gray-300">{project.description}</p>
 
       <p className="mt-4 text-xs text-gray-500">{project.date}</p>
 
-      <div className="mt-3 flex flex-wrap gap-2">
-        {project.technologies.map((tech) => (
-          <span
-            key={tech}
-            className="rounded-full border border-white/15 px-2 py-0.5 text-xs text-gray-300"
-          >
-            {tech}
-          </span>
-        ))}
+      {/* Flexible spacer keeps skills pinned to the bottom regardless of description length */}
+      <div className="mt-auto pt-4">
+        <div className="flex flex-wrap gap-2">
+          {project.technologies.map((tech) => (
+            <span
+              key={tech}
+              className="rounded-full border border-white/15 px-2 py-0.5 text-xs text-gray-300"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
       </div>
-
-      {project.githubUrl && project.githubUrl !== "#" && (
-        <a
-          href={project.githubUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`View ${project.name} on GitHub`}
-          className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-        >
-          <img src="/Images/Image3.svg" alt="" className="h-4 w-4 invert" />
-        </a>
-      )}
     </article>
   );
 }
