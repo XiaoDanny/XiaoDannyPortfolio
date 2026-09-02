@@ -641,7 +641,7 @@ export default function HomeClient({ initialViews, githubActivity }: { initialVi
 
                 <div className="mt-8 flex flex-wrap items-center justify-start gap-4">
                   <a
-                    href="/DanielCoyleResumeSep2025.pdf"
+                    href="/DanielCoyleResume.pdf"
                     download
                     className="inline-flex h-10 items-center gap-3 rounded-md border border-white/20 px-4 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-black"
                   >
