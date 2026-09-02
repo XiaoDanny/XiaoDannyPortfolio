@@ -100,15 +100,16 @@ function MobileTimeline({
 }) {
   return (
     <div className="relative lg:hidden">
-      <div className="absolute bottom-2 left-[15px] top-2 w-px bg-white/10" />
       <div className="flex flex-col gap-5">
         {ENTRIES.map((entry, i) => {
           const isActive = active === i;
           const color = ACCENT[entry.type];
           const glow = ACCENT_GLOW[entry.type];
+          const isLast = i === ENTRIES.length - 1;
 
           return (
             <div key={entry.company} className="relative flex gap-4">
+              {!isLast && <div className="pointer-events-none absolute left-4 top-5 h-[calc(100%+20px)] w-px bg-white/10" />}
               <button
                 onClick={() => setActive(isActive ? null : i)}
                 className="relative z-10 mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full
@@ -406,6 +407,13 @@ function MountainTimeline({
         );
       })}
       </div>
+
+      <span className="pointer-events-none absolute left-0 top-[46%] -translate-y-1/2 text-[10px] uppercase tracking-[0.16em] text-gray-500" aria-hidden="true">
+        Earlier
+      </span>
+      <span className="pointer-events-none absolute right-0 top-[43%] -translate-y-1/2 text-[10px] uppercase tracking-[0.16em] text-gray-500" aria-hidden="true">
+        Most recent
+      </span>
     </div>
   );
 }

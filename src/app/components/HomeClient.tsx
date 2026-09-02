@@ -6,8 +6,23 @@ import Experience from "./Experience";
 import { CONTAINER } from "./Container";
 import { type GithubActivity } from "../lib/githubActivity";
 import { type LeetcodeActivity, type LeetcodeDay } from "../lib/leetcodeActivity";
+import { type LatestVideo } from "../lib/youtubeActivity";
 
 const LEETCODE_USER = "XiaoDanny";
+
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(query);
+    const updateMatches = () => setMatches(mediaQuery.matches);
+    updateMatches();
+    mediaQuery.addEventListener("change", updateMatches);
+    return () => mediaQuery.removeEventListener("change", updateMatches);
+  }, [query]);
+
+  return matches;
+}
 
 const photos = [
   { src: "/Images/BeyondTheCode/Daniel1.jpg", alt: "Daniel Coyle", objectPosition: "center 35%" },
@@ -179,8 +194,6 @@ const RACE_TEXTS = [
   // Kung Fu Panda
   "Yesterday is history, tomorrow is a mystery, but today is a gift. That is why it is called the present.",
 ];
-
-const LATEST_PIANO_VIDEO: { id: string; views: string } | null = null;
 
 function shuffle<T>(array: T[]): T[] {
   const result = [...array];
@@ -531,10 +544,10 @@ function LeetcodeIcon() {
 // LeetCode's own ramp: unfilled cells stay near-canvas, activity climbs through green.
 const HEATMAP_LEVELS = [
   "rgba(255,255,255,0.07)",
-  "rgba(45,122,62,0.55)",
-  "rgba(45,150,70,0.75)",
-  "rgba(56,190,90,0.9)",
-  "rgb(74,222,110)",
+  "rgba(45,122,62,0.45)",
+  "rgba(45,150,70,0.65)",
+  "rgba(56,180,90,0.8)",
+  "rgb(82,190,105)",
 ];
 
 const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -562,9 +575,15 @@ function LeetcodeView({
   currentStreak,
   calendar,
 }: LeetcodeActivity) {
+  const isMobile = useMediaQuery("(max-width: 767px)");
+  const visibleCalendar = isMobile ? calendar.slice(-182) : calendar;
+  const visibleSubmissions = isMobile
+    ? visibleCalendar.reduce((total, day) => total + day.count, 0)
+    : submissionsPastYear;
+
   // Pad the head so every column is a full Sun–Sat week, matching LeetCode's grid.
-  const leadingBlanks = calendar.length > 0 ? new Date(`${calendar[0].date}T00:00:00Z`).getUTCDay() : 0;
-  const cells: (LeetcodeDay | null)[] = [...Array<null>(leadingBlanks).fill(null), ...calendar];
+  const leadingBlanks = visibleCalendar.length > 0 ? new Date(`${visibleCalendar[0].date}T00:00:00Z`).getUTCDay() : 0;
+  const cells: (LeetcodeDay | null)[] = [...Array<null>(leadingBlanks).fill(null), ...visibleCalendar];
   const weeks: (LeetcodeDay | null)[][] = [];
   for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
 
@@ -589,7 +608,7 @@ function LeetcodeView({
   const ringCircumference = 2 * Math.PI * ringRadius;
 
   return (
-    <div className="relative grid h-full min-h-0 grid-rows-2">
+    <div className="relative flex h-full min-h-0 flex-col gap-3 md:grid md:grid-rows-2 md:gap-0">
       <a
         href={`https://leetcode.com/u/${LEETCODE_USER}/`}
         target="_blank"
@@ -602,7 +621,7 @@ function LeetcodeView({
       </a>
 
       {/* Top half — solved ring, difficulty progress, streak totals */}
-      <div className="flex min-h-0 items-center justify-center gap-4">
+      <div className="flex min-h-0 flex-wrap items-center justify-center gap-4 md:flex-nowrap">
         <div className="relative h-[78px] w-[78px] shrink-0">
           <svg viewBox="0 0 78 78" className="h-full w-full -rotate-90">
             <circle cx="39" cy="39" r={ringRadius} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="5" />
@@ -646,7 +665,7 @@ function LeetcodeView({
           ))}
         </div>
 
-        <div className="flex shrink-0 items-center gap-3 border-l border-subtle pl-4">
+        <div className="flex basis-full items-center justify-center gap-3 border-t border-subtle pt-3 md:basis-auto md:border-l md:border-t-0 md:pl-4 md:pt-0">
           {[
             { value: totalSubmissions.toLocaleString(), label: "Submissions" },
             { value: currentStreak, label: "Streak" },
@@ -663,18 +682,18 @@ function LeetcodeView({
       {/* Bottom half — submission heatmap */}
       <div className="flex min-h-0 flex-col justify-center border-t border-subtle pt-2">
         <p className="text-[11px] leading-4 text-gray-400">
-          <span className="font-semibold text-white">{submissionsPastYear.toLocaleString()}</span> submissions in the past one year
+          <span className="font-semibold text-white">{visibleSubmissions.toLocaleString()}</span> submissions in the past {isMobile ? "six months" : "one year"}
         </p>
 
-        <div className="mt-1 flex gap-[3px]" role="img" aria-label={`${submissionsPastYear} LeetCode submissions in the past year`}>
+        <div className="mt-1 flex gap-px sm:gap-[3px]" role="img" aria-label={`${visibleSubmissions} LeetCode submissions in the past ${isMobile ? "six months" : "year"}`}>
           {monthGroups.map((group, groupIndex) => (
             <div
               key={`${group.label}-${groupIndex}`}
-              className="flex min-w-0 gap-[1px]"
+              className="flex min-w-0 gap-px"
               style={{ flexGrow: group.weeks.length, flexBasis: 0 }}
             >
               {group.weeks.map((week, weekIndex) => (
-                <div key={weekIndex} className="flex min-w-0 flex-1 flex-col gap-[1px]">
+                <div key={weekIndex} className="flex min-w-0 flex-1 flex-col gap-px">
                   {week.map((day, dayIndex) => (
                     <div
                       key={day?.date ?? `${weekIndex}-${dayIndex}`}
@@ -689,7 +708,7 @@ function LeetcodeView({
           ))}
         </div>
 
-        <div className="mt-1 flex gap-[3px] text-[8px] leading-none text-gray-500">
+        <div className="mt-1 flex gap-px text-[8px] leading-[1.3] text-gray-500 sm:gap-[3px]">
           {monthGroups.map((group, groupIndex) => (
             <div
               key={`${group.label}-${groupIndex}`}
@@ -699,6 +718,16 @@ function LeetcodeView({
               {group.label}
             </div>
           ))}
+        </div>
+
+        <div className="mt-2 flex items-center justify-center gap-1.5 text-[8px] leading-none text-gray-500 sm:justify-end">
+          <span>Less</span>
+          <div className="flex items-center gap-px" aria-hidden="true">
+            {HEATMAP_LEVELS.map((color, index) => (
+              <span key={index} className="h-2.5 w-2.5 rounded-[1px]" style={{ background: color }} />
+            ))}
+          </div>
+          <span>More</span>
         </div>
       </div>
     </div>
@@ -765,7 +794,7 @@ function WeatherIcon({ code, isDay }: { code?: number; isDay: boolean }) {
   );
 }
 
-function PianoVideoQuadrant() {
+function PianoVideoQuadrant({ latestVideo }: { latestVideo: LatestVideo | null }) {
   return (
     <div className="col-span-2 flex w-full min-w-0 flex-col self-start lg:col-span-2">
       <div className="flex items-center justify-between gap-4 pb-2">
@@ -775,15 +804,15 @@ function PianoVideoQuadrant() {
             <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
             <circle cx="12" cy="12" r="2.5" />
           </svg>
-          {LATEST_PIANO_VIDEO?.views ? `${LATEST_PIANO_VIDEO.views} views` : "0 views"}
+          {latestVideo?.views ? `${latestVideo.views} views` : "0 views"}
         </span>
       </div>
 
       <div className="bg-canvas relative aspect-video overflow-hidden rounded-lg border border-subtle">
-        {LATEST_PIANO_VIDEO ? (
+        {latestVideo ? (
           <iframe
             title="Latest piano video"
-            src={`https://www.youtube.com/embed/${LATEST_PIANO_VIDEO.id}?autoplay=1&mute=1&rel=0`}
+            src={`https://www.youtube.com/embed/${latestVideo.id}?autoplay=1&mute=1&rel=0`}
             className="absolute inset-0 h-full w-full"
             allow="autoplay; encrypted-media"
             allowFullScreen
@@ -802,12 +831,12 @@ function PianoVideoQuadrant() {
   );
 }
 
-function BeyondSection({ githubActivity, leetcodeActivity }: { githubActivity: GithubActivity; leetcodeActivity: LeetcodeActivity }) {
+function BeyondSection({ githubActivity, leetcodeActivity, latestVideo }: { githubActivity: GithubActivity; leetcodeActivity: LeetcodeActivity; latestVideo: LatestVideo | null }) {
   return (
     <section id="beyond" className={`scroll-mt-20 ${SECTION_SPACING}`}>
       <div className={CONTAINER}>
         <div className="grid grid-cols-2 items-stretch gap-4 lg:grid-cols-4">
-          <PianoVideoQuadrant />
+          <PianoVideoQuadrant latestVideo={latestVideo} />
           <ActivityWidget github={githubActivity} leetcode={leetcodeActivity} />
           <div className="col-span-2 lg:col-span-2"><TypeRacerWidget /></div>
           <div className="col-span-2 lg:col-span-1"><ClickMeWidget /></div>
@@ -818,7 +847,7 @@ function BeyondSection({ githubActivity, leetcodeActivity }: { githubActivity: G
   );
 }
 
-export default function HomeClient({ initialViews, githubActivity, leetcodeActivity }: { initialViews: number; githubActivity: GithubActivity; leetcodeActivity: LeetcodeActivity }) {
+export default function HomeClient({ initialViews, githubActivity, leetcodeActivity, latestVideo }: { initialViews: number; githubActivity: GithubActivity; leetcodeActivity: LeetcodeActivity; latestVideo: LatestVideo | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const siteViews = initialViews;
 
@@ -1025,7 +1054,7 @@ export default function HomeClient({ initialViews, githubActivity, leetcodeActiv
             <Experience />
           </section>
 
-          <BeyondSection githubActivity={githubActivity} leetcodeActivity={leetcodeActivity} />
+          <BeyondSection githubActivity={githubActivity} leetcodeActivity={leetcodeActivity} latestVideo={latestVideo} />
         </main>
         <footer className={`${CONTAINER} mb-4`}>
           <div className="bg-canvas flex w-full flex-col gap-5 rounded-xl border border-subtle px-5 py-5 text-xs text-gray-400 sm:px-6 sm:py-4 lg:flex-row lg:items-center lg:justify-between">
