@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface ProjectEntry {
   name: string;
@@ -18,12 +19,12 @@ const projects: ProjectEntry[] = [
   {
     name: "Alpha Ring",
     description:
-      "An open-source mod for Halo: The Master Chief Collection that enables local split-screen co-op on PC, with support for multiple players, controller profiles, and customizable gameplay settings.",
+      "An open source mod that restores local split screen co op to Halo: The Master Chief Collection on PC, used by thousands of players. Contributing UI fixes and new features.",
     date: "July 2026 - Present",
-    technologies: [],
+    technologies: ["C++", "CMake"],
     featured: true,
     demoUrl: "https://www.youtube.com/watch?v=IRZPdAJFkc8",
-    githubUrl: "https://github.com/kirklandsig/AlphaRing",
+    githubUrl: "https://github.com/megabitt01/AlphaRing/tree/xiaodanny",
     image: "/Images/Projects/AlphaRing.png",
   },
   {
@@ -76,16 +77,18 @@ function FeaturedProjectCard({ project }: { project: ProjectEntry }) {
   return (
     <article
       onClick={() => setShowDetails((current) => !current)}
-      className="group relative aspect-[25/17] w-full cursor-pointer overflow-hidden rounded-[28px] border border-white/10 bg-[#131316] md:cursor-default"
+      className="group relative aspect-[25/17] w-full cursor-pointer overflow-hidden rounded-[28px] border border-white/10 bg-[var(--surface)] md:cursor-default"
     >
       {project.image ? (
-        <img
+        <Image
           src={project.image}
           alt={`${project.name} screenshot`}
-          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="object-cover"
         />
       ) : (
-        <div className="absolute inset-0 bg-[#131316]" />
+        <div className="absolute inset-0 bg-[var(--surface)]" />
       )}
 
       <div
@@ -123,7 +126,7 @@ function FeaturedProjectCard({ project }: { project: ProjectEntry }) {
               aria-label={`View ${project.name} on GitHub`}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
-              <img src="/Images/Image3.svg" alt="" className="h-4 w-4 invert" />
+              <Image src="/Images/Image3.svg" alt="" width={16} height={16} className="h-4 w-4 invert" />
             </a>
           )}
           {project.demoUrl === "#" && project.githubUrl === "#" && (
@@ -149,7 +152,7 @@ function AllProjectCard({ project }: { project: ProjectEntry }) {
             aria-label={`View ${project.name} on GitHub`}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
-            <img src="/Images/Image3.svg" alt="" className="h-4 w-4 invert" />
+            <Image src="/Images/Image3.svg" alt="" width={16} height={16} className="h-4 w-4 invert" />
           </a>
         )}
       </div>

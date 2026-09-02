@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import NextImage from "next/image";
 
 // ─── To add a new experience, push an object to ENTRIES ──────────────────────
 // Order: newest first (top of tree) → oldest last (near roots)
@@ -18,33 +19,42 @@ interface Entry {
 }
 
 const ENTRIES: Entry[] = [
-  {
-    company:     "Handshake",
-    role:        "AI QA",
-    date:        "Oct – Nov 2025",
-    description: "Performed data annotation and evaluation of LLM outputs, collaborating with researchers to improve AI quality, performance, and contextual reliability.",
-    website:     "https://joinhandshake.com/blog/our-team/introducing-handshake-ai/",
-    image:       "/Images/Experience/Handshake.png",
-    type:        "work",
-  },
-  {
-    company:     "Calit2",
-    role:        "Software Engineer",
-    date:        "Mar – Jun 2024",
-    description: "Developed the Cooling Center Locator, a full-stack web app helping users find nearby cooling centers and access heat-safety resources.",
-    website:     "https://calit2.uci.edu/",
-    image:       "/Images/Experience/Calit2.jpg",
-    type:        "work",
-  },
-  {
-    company:     "UCI Esports",
-    role:        "Scholarship Athlete",
-    date:        "Mar 2022 – Jun 2025",
-    description: "Competed professionally while completing a Computer Science degree, developing leadership and communication through high-stakes team competition.",
-    website:     "https://esports.uci.edu/",
-    image:       "/Images/Experience/UCIesports.png",
-    type:        "other",
-  },
+{
+  company:     "Coding Mind Academy",
+  role:        "Instructor / Tutor",
+  date:        "Sep 2026 – Present",
+  description: "Teaching data structures, algorithms, and Python programming to students of mixed ages.",
+  website:     "https://codingmind.com/",
+  image:       "/Images/Experience/CodingMind.jpg",
+  type:        "work",
+},
+{
+  company:     "Handshake",
+  role:        "AI QA",
+  date:        "Oct – Nov 2025",
+  description: "Annotated and evaluated image data for a confidential AI lab project through Handshake AI, contributing to a dataset used to train and evaluate frontier models.",
+  website:     "https://joinhandshake.com/blog/our-team/introducing-handshake-ai/",
+  image:       "/Images/Experience/Handshake.png",
+  type:        "work",
+},
+{
+  company:     "Calit2",
+  role:        "Software Engineer",
+  date:        "Mar – Jun 2024",
+  description: "Developed the Cooling Center Locator, a full-stack web app helping users find nearby cooling centers and access heat-safety resources.",
+  website:     "https://calit2.uci.edu/",
+  image:       "/Images/Experience/Calit2.jpg",
+  type:        "work",
+},
+{
+  company:     "UCI Esports",
+  role:        "Scholarship Athlete",
+  date:        "Mar 2022 – Jun 2025",
+  description: "Competed at a professional level while completing a Computer Science degree, balancing a demanding dual commitment.",
+  website:     "https://esports.uci.edu/",
+  image:       "/Images/Experience/UCIesports.png",
+  type:        "other",
+},
 ];
 
 const NODE_R = 7; // node dot radius
@@ -102,7 +112,7 @@ function MobileTimeline({
                 onClick={() => setActive(isActive ? null : i)}
                 className="relative z-10 mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full
                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white
-                           focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]"
+                           focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
                 aria-label={isActive ? `Collapse ${entry.company}` : `Expand ${entry.company}`}
               >
                 <span
@@ -126,9 +136,11 @@ function MobileTimeline({
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <img
+                    <NextImage
                       src={entry.image}
                       alt={entry.company}
+                      width={32}
+                      height={32}
                       className="h-8 w-8 flex-shrink-0 rounded-lg object-cover border border-white/10 bg-black/20"
                     />
                     <div className="min-w-0">
@@ -146,7 +158,7 @@ function MobileTimeline({
                     href={entry.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-1.5 flex items-center gap-1 px-1 text-[10px] text-gray-500 transition-colors hover:text-white"
+                    className="mt-1.5 flex items-center gap-1 px-1 text-[10px] text-gray-400 transition-colors hover:text-white"
                   >
                     Visit site ↗
                   </a>
@@ -315,7 +327,7 @@ function MountainTimeline({
                 onClick={() => setActive(null)}
                 className="absolute bottom-0 left-1/2 z-20 w-6 -translate-x-1/2 cursor-pointer
                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white
-                           focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1115]"
+                           focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
                 style={{ height: stemHeight }}
                 aria-label={`Collapse ${entry.company}`}
               />
@@ -329,11 +341,13 @@ function MountainTimeline({
               }}
             >
               {isActive ? (
-                <div className="w-64 animate-[experience-pop_300ms_ease-out] rounded-xl border border-white/10 bg-white/[0.03] p-4 text-left">
+                <div className="w-64 animate-[experience-pop_300ms_ease-out] rounded-xl border border-white/20 bg-[var(--surface)] p-4 text-left">
                   <div className="flex items-center gap-2.5">
-                    <img
+                    <NextImage
                       src={entry.image}
                       alt={entry.company}
+                      width={32}
+                      height={32}
                       className="h-8 w-8 flex-shrink-0 rounded-lg object-cover border border-white/10 bg-black/20"
                     />
                     <div className="min-w-0">
@@ -347,7 +361,7 @@ function MountainTimeline({
                     href={entry.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-2 flex items-center gap-1 text-[10px] text-gray-500 transition-colors hover:text-white"
+                    className="mt-2 flex items-center gap-1 text-[10px] text-gray-400 transition-colors hover:text-white"
                   >
                     Visit site ↗
                   </a>
@@ -355,9 +369,9 @@ function MountainTimeline({
               ) : (
                 <button
                   onClick={() => setActive(originalIndex)}
-                  className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-white/10 bg-[#131316]/90 px-3 py-1.5 text-[11px] font-medium leading-none text-gray-300 shadow-md transition-colors hover:border-white/25 hover:text-white"
+                  className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-white/10 bg-[var(--surface)]/90 px-3 py-1.5 text-[11px] font-medium leading-none text-gray-300 shadow-md transition-colors hover:border-white/25 hover:text-white"
                 >
-                  <img src={entry.image} alt="" className="h-4 w-4 flex-shrink-0 rounded-full object-cover" />
+                  <NextImage src={entry.image} alt="" width={16} height={16} className="h-4 w-4 flex-shrink-0 rounded-full object-cover" />
                   <span>{entry.company}</span>
                 </button>
               )}
