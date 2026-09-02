@@ -3,7 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import NextImage from "next/image";
 import Projects from "./Projects";
 import Experience from "./Experience";
+import { CONTAINER } from "./Container";
 import { type GithubActivity } from "../lib/githubActivity";
+import { type LeetcodeActivity, type LeetcodeDay } from "../lib/leetcodeActivity";
+
+const LEETCODE_USER = "XiaoDanny";
 
 const photos = [
   { src: "/Images/BeyondTheCode/Daniel1.jpg", alt: "Daniel Coyle", objectPosition: "center 35%" },
@@ -11,6 +15,69 @@ const photos = [
   { src: "/Images/BeyondTheCode/Daniel2.jpg", alt: "Daniel Coyle at Yellowstone National Park", objectPosition: "52% 55%" },
   { src: "/Images/BeyondTheCode/LookingUp.jpg", alt: "Daniel Coyle, UC Irvine Class of 2025", objectPosition: "30% 30%" },
 ];
+
+/** Photo shown first. Change this src to feature a different photo. */
+const FEATURED_PHOTO_SRC = "/Images/BeyondTheCode/Daniel1.jpg";
+
+const STACK_TRANSITION = "transition-all duration-500 ease-[cubic-bezier(.4,0,.2,1)]";
+
+/** Single vertical rhythm between sections: each owns its bottom gap, none add top padding. */
+const SECTION_SPACING = "pb-16";
+
+function PhotoStack() {
+  const featuredIndex = Math.max(0, photos.findIndex((photo) => photo.src === FEATURED_PHOTO_SRC));
+  const [active, setActive] = useState(featuredIndex);
+
+  return (
+    <div className="relative z-0 flex shrink-0 flex-col items-center gap-3">
+      <button
+        type="button"
+        onClick={() => setActive((current) => (current + 1) % photos.length)}
+        aria-label={`Photo ${active + 1} of ${photos.length}: ${photos[active].alt}. Tap for the next photo.`}
+        className={`${STACK_TRANSITION} relative h-[232px] w-[166px] cursor-pointer appearance-none overflow-hidden rounded-2xl border-0 bg-transparent p-0 shadow-[0_18px_45px_-12px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--background)] md:h-[256px] md:w-[183px] md:hover:scale-[1.02]`}
+      >
+        {photos.map((photo, index) => (
+          <div
+            key={photo.src}
+            aria-hidden={index !== active}
+            className={`${STACK_TRANSITION} absolute inset-0 ${index === active ? "opacity-100" : "opacity-0"}`}
+          >
+            <NextImage
+              src={photo.src}
+              alt={index === active ? photo.alt : ""}
+              fill
+              sizes="206px"
+              style={{ objectPosition: photo.objectPosition }}
+              className="object-cover"
+            />
+          </div>
+        ))}
+      </button>
+
+      <div className="flex items-center gap-1" role="tablist" aria-label="Choose a photo">
+        {photos.map((photo, index) => (
+          <button
+            key={photo.src}
+            type="button"
+            role="tab"
+            aria-selected={index === active}
+            aria-label={`Show photo ${index + 1}: ${photo.alt}`}
+            onClick={() => setActive(index)}
+            className="group cursor-pointer p-1.5 focus-visible:outline-none"
+          >
+            <span
+              className={`${STACK_TRANSITION} block h-1.5 w-1.5 rounded-full ${
+                index === active
+                  ? "bg-white/75"
+                  : "bg-white/20 group-hover:bg-white/40"
+              } group-focus-visible:ring-2 group-focus-visible:ring-white/60 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[var(--background)]`}
+            />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // Inline flag icons so flags render as pictures (Windows falls back to plain "US"/"TW" text for emoji flags)
 function UsFlagIcon({ "aria-label": ariaLabel }: { "aria-label": string }) {
@@ -226,7 +293,7 @@ function TypeRacerWidget() {
   }
 
   return (
-    <div className="relative flex min-h-[220px] flex-col rounded-xl border border-white/10 bg-canvas p-3 text-left sm:min-h-[260px] sm:p-4">
+    <div className="bg-canvas relative flex min-h-[220px] flex-col rounded-xl border border-subtle p-3 text-left sm:min-h-[260px] sm:p-4">
       <button
         type="button"
         onClick={nextSentence}
@@ -274,7 +341,7 @@ function TypeRacerWidget() {
         readOnly={finishedTime !== null}
         aria-label="TypeRacer input"
         placeholder="Start typing here..."
-        className="w-full cursor-text rounded-md border border-white/15 bg-transparent px-2.5 py-1.5 text-xs font-mono text-white outline-none transition-colors placeholder:text-gray-600 focus:border-white/40 disabled:opacity-60 sm:px-3 sm:py-2 sm:text-sm"
+        className="w-full cursor-text rounded-md border border-subtle bg-transparent px-2.5 py-1.5 text-xs font-mono text-white outline-none transition-colors placeholder:text-gray-600 focus:border-white/40 disabled:opacity-60 sm:px-3 sm:py-2 sm:text-sm"
         />
       </div>
       <div className="mt-2 flex h-6 items-center justify-between text-[10px] uppercase tracking-[0.1em] text-gray-400 sm:mt-0 sm:h-8 sm:text-[11px] sm:tracking-[0.13em]">
@@ -330,7 +397,7 @@ function ClickMeWidget() {
         }
       }}
       aria-label="Click Me counter"
-      className={`relative flex h-full min-h-[220px] cursor-pointer flex-col items-center justify-center rounded-xl border border-white/10 bg-canvas p-4 text-center text-white outline-none transition-transform duration-150 hover:border-white/25 focus-visible:ring-2 focus-visible:ring-white ${isPressed ? "animate-[click-pop_240ms_ease-out]" : ""}`}
+      className={`bg-canvas relative flex h-full min-h-[220px] cursor-pointer flex-col items-center justify-center rounded-xl border border-strong p-4 text-center text-white outline-none transition-transform duration-150 hover:border-white/45 focus-visible:ring-2 focus-visible:ring-white ${isPressed ? "animate-[click-pop_240ms_ease-out]" : ""}`}
     >
       <p className="text-4xl font-semibold tracking-wide text-white md:text-5xl">
         {clicks === null ? "--" : clicks.toLocaleString()}
@@ -360,9 +427,39 @@ function GithubIcon() {
 
 // Purely presentational — every value it renders comes in as props, so the data
 // source (static snapshot today, a live fetch later) can change without touching this.
-function RecentCommitsWidget({ commits, languages, languageTimeframeLabel }: GithubActivity) {
+function ActivityWidget({ github, leetcode }: { github: GithubActivity; leetcode: LeetcodeActivity }) {
+  const [view, setView] = useState<"github" | "leetcode">("github");
+
   return (
-    <div className="col-span-2 flex h-full min-h-[220px] flex-col rounded-xl border border-white/10 bg-canvas p-4 text-left lg:col-span-2 lg:mt-[23px] lg:h-[306px]">
+    <div className="col-span-2 flex flex-col lg:col-span-2">
+      {/* Same height as the "Hear Me Play" label row, so this card's top edge lines up with the video's. */}
+      <div className="flex items-center justify-between gap-4 pb-2">
+        <span className="text-[10px] uppercase tracking-[0.18em] text-gray-400">
+          {view === "github" ? "Recent Commits" : "LeetCode Progress"}
+        </span>
+        <button
+          type="button"
+          onClick={() => setView((current) => (current === "github" ? "leetcode" : "github"))}
+          aria-label={`Swap to ${view === "github" ? "LeetCode" : "GitHub"} view`}
+          className="inline-flex items-center gap-1 text-[10px] uppercase leading-none tracking-[0.18em] text-gray-500 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
+        >
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-none stroke-current" strokeWidth="2" aria-hidden="true">
+            <path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Swap
+        </button>
+      </div>
+
+      <div className="bg-canvas flex h-full min-h-[220px] flex-1 flex-col rounded-xl border border-subtle p-4 text-left">
+        {view === "github" ? <CommitsView {...github} /> : <LeetcodeView {...leetcode} />}
+      </div>
+    </div>
+  );
+}
+
+function CommitsView({ commits, languages, languageTimeframeLabel }: GithubActivity) {
+  return (
+    <>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <CommitIcon />
@@ -380,7 +477,7 @@ function RecentCommitsWidget({ commits, languages, languageTimeframeLabel }: Git
         </a>
       </div>
 
-      <ul className="mt-3 space-y-1.5">
+      <ul className="mt-3 min-h-0 flex-1 space-y-1.5 overflow-hidden">
         {commits.map((commit) => (
           <li key={commit.hash}>
             <a
@@ -404,7 +501,7 @@ function RecentCommitsWidget({ commits, languages, languageTimeframeLabel }: Git
       </ul>
 
       {languages.length > 0 && (
-        <div className="mt-auto border-t border-white/10 pt-3">
+        <div className="mt-auto border-t border-subtle pt-3">
           <p className="text-[11px] uppercase tracking-[0.14em] text-gray-400">{languageTimeframeLabel}</p>
           <div className="mt-2 space-y-1.5">
             {languages.map((lang) => (
@@ -419,6 +516,191 @@ function RecentCommitsWidget({ commits, languages, languageTimeframeLabel }: Git
           </div>
         </div>
       )}
+    </>
+  );
+}
+
+function LeetcodeIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+      <path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.02-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z" />
+    </svg>
+  );
+}
+
+// LeetCode's own ramp: unfilled cells stay near-canvas, activity climbs through green.
+const HEATMAP_LEVELS = [
+  "rgba(255,255,255,0.07)",
+  "rgba(45,122,62,0.55)",
+  "rgba(45,150,70,0.75)",
+  "rgba(56,190,90,0.9)",
+  "rgb(74,222,110)",
+];
+
+const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function heatmapLevel(count: number) {
+  if (count <= 0) return 0;
+  if (count <= 2) return 1;
+  if (count <= 5) return 2;
+  if (count <= 10) return 3;
+  return 4;
+}
+
+function LeetcodeView({
+  totalSolved,
+  totalQuestions,
+  easySolved,
+  easyTotal,
+  mediumSolved,
+  mediumTotal,
+  hardSolved,
+  hardTotal,
+  totalSubmissions,
+  submissionsPastYear,
+  maxStreak,
+  currentStreak,
+  calendar,
+}: LeetcodeActivity) {
+  // Pad the head so every column is a full Sun–Sat week, matching LeetCode's grid.
+  const leadingBlanks = calendar.length > 0 ? new Date(`${calendar[0].date}T00:00:00Z`).getUTCDay() : 0;
+  const cells: (LeetcodeDay | null)[] = [...Array<null>(leadingBlanks).fill(null), ...calendar];
+  const weeks: (LeetcodeDay | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+
+  // Group weeks into months so each label can center over its own block of columns.
+  const monthGroups: { label: string; weeks: (LeetcodeDay | null)[][] }[] = [];
+  for (const week of weeks) {
+    const firstDay = week.find((day): day is LeetcodeDay => day !== null);
+    const label = firstDay ? MONTH_LABELS[Number(firstDay.date.slice(5, 7)) - 1] : "";
+    const current = monthGroups[monthGroups.length - 1];
+    if (current && current.label === label) current.weeks.push(week);
+    else monthGroups.push({ label, weeks: [week] });
+  }
+
+  const difficulties = [
+    { label: "Easy", solved: easySolved, total: easyTotal, color: "rgb(56,189,248)" },
+    { label: "Medium", solved: mediumSolved, total: mediumTotal, color: "rgb(251,191,36)" },
+    { label: "Hard", solved: hardSolved, total: hardTotal, color: "rgb(248,113,113)" },
+  ];
+
+  const solvedPct = totalQuestions > 0 ? (totalSolved / totalQuestions) * 100 : 0;
+  const ringRadius = 34;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+
+  return (
+    <div className="relative grid h-full min-h-0 grid-rows-2">
+      <a
+        href={`https://leetcode.com/u/${LEETCODE_USER}/`}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open LeetCode profile"
+        title="LeetCode"
+        className="absolute right-0 top-0 z-10 text-gray-400 transition-colors hover:text-white"
+      >
+        <LeetcodeIcon />
+      </a>
+
+      {/* Top half — solved ring, difficulty progress, streak totals */}
+      <div className="flex min-h-0 items-center justify-center gap-4">
+        <div className="relative h-[78px] w-[78px] shrink-0">
+          <svg viewBox="0 0 78 78" className="h-full w-full -rotate-90">
+            <circle cx="39" cy="39" r={ringRadius} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="5" />
+            <circle
+              cx="39"
+              cy="39"
+              r={ringRadius}
+              fill="none"
+              stroke="var(--accent-gold)"
+              strokeWidth="5"
+              strokeLinecap="round"
+              strokeDasharray={ringCircumference}
+              strokeDashoffset={ringCircumference * (1 - solvedPct / 100)}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-xl font-semibold leading-none text-white">{totalSolved}</span>
+            <span className="mt-1 text-[8px] uppercase tracking-[0.14em] text-gray-400">Solved</span>
+          </div>
+        </div>
+
+        <div className="shrink-0 space-y-1.5">
+          {difficulties.map((difficulty) => (
+            <div key={difficulty.label} className="flex items-center gap-2">
+              <span className="w-[42px] shrink-0 text-[9px] font-semibold" style={{ color: difficulty.color }}>
+                {difficulty.label}
+              </span>
+              <div className="h-1 w-12 shrink-0 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${difficulty.total > 0 ? (difficulty.solved / difficulty.total) * 100 : 0}%`,
+                    background: difficulty.color,
+                  }}
+                />
+              </div>
+              <span className="w-[56px] shrink-0 text-[9px] tabular-nums text-gray-400">
+                {difficulty.solved}/{difficulty.total.toLocaleString()}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex shrink-0 items-center gap-3 border-l border-subtle pl-4">
+          {[
+            { value: totalSubmissions.toLocaleString(), label: "Submissions" },
+            { value: currentStreak, label: "Streak" },
+            { value: maxStreak, label: "Best" },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center">
+              <p className="text-lg font-semibold leading-none tabular-nums text-white">{stat.value}</p>
+              <p className="mt-1 text-[8px] uppercase tracking-[0.14em] text-gray-400">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom half — submission heatmap */}
+      <div className="flex min-h-0 flex-col justify-center border-t border-subtle pt-2">
+        <p className="text-[11px] leading-4 text-gray-400">
+          <span className="font-semibold text-white">{submissionsPastYear.toLocaleString()}</span> submissions in the past one year
+        </p>
+
+        <div className="mt-1 flex gap-[3px]" role="img" aria-label={`${submissionsPastYear} LeetCode submissions in the past year`}>
+          {monthGroups.map((group, groupIndex) => (
+            <div
+              key={`${group.label}-${groupIndex}`}
+              className="flex min-w-0 gap-[1px]"
+              style={{ flexGrow: group.weeks.length, flexBasis: 0 }}
+            >
+              {group.weeks.map((week, weekIndex) => (
+                <div key={weekIndex} className="flex min-w-0 flex-1 flex-col gap-[1px]">
+                  {week.map((day, dayIndex) => (
+                    <div
+                      key={day?.date ?? `${weekIndex}-${dayIndex}`}
+                      title={day ? `${day.count} on ${day.date}` : undefined}
+                      className="aspect-square w-full rounded-[1px]"
+                      style={{ background: day ? HEATMAP_LEVELS[heatmapLevel(day.count)] : "transparent" }}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-1 flex gap-[3px] text-[8px] leading-none text-gray-500">
+          {monthGroups.map((group, groupIndex) => (
+            <div
+              key={`${group.label}-${groupIndex}`}
+              className="min-w-0 truncate text-center"
+              style={{ flexGrow: group.weeks.length, flexBasis: 0 }}
+            >
+              {group.label}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -456,7 +738,7 @@ function WeatherWidget() {
   const condition = data?.code === 0 ? "Clear" : data?.code !== undefined && data.code < 4 ? "Partly cloudy" : data?.code !== undefined && data.code < 80 ? "Cloudy" : data?.code !== undefined && data.code < 83 ? "Rain" : data?.code !== undefined && data.code < 86 ? "Snow" : "Storm";
 
   return (
-    <div className="col-span-2 flex min-h-[220px] flex-col items-center justify-center rounded-xl border border-white/10 bg-canvas p-4 text-center lg:col-span-1">
+    <div className="bg-canvas col-span-2 flex min-h-[220px] flex-col items-center justify-center rounded-xl border border-subtle p-4 text-center lg:col-span-1">
       <p className="text-[10px] uppercase tracking-[0.18em] text-gray-400">Birmingham, AL</p>
       <div className="mt-3 flex items-center justify-center gap-4">
         <WeatherIcon code={data?.code} isDay={data?.isDay ?? true} />
@@ -497,7 +779,7 @@ function PianoVideoQuadrant() {
         </span>
       </div>
 
-      <div className="relative aspect-video overflow-hidden rounded-lg border border-white/10 bg-canvas">
+      <div className="bg-canvas relative aspect-video overflow-hidden rounded-lg border border-subtle">
         {LATEST_PIANO_VIDEO ? (
           <iframe
             title="Latest piano video"
@@ -520,13 +802,13 @@ function PianoVideoQuadrant() {
   );
 }
 
-function BeyondSection({ githubActivity }: { githubActivity: GithubActivity }) {
+function BeyondSection({ githubActivity, leetcodeActivity }: { githubActivity: GithubActivity; leetcodeActivity: LeetcodeActivity }) {
   return (
-    <section id="beyond" className="scroll-mt-20 pb-12 pt-4">
-      <div className={`${"mx-auto w-full max-w-6xl px-6"}`}>
+    <section id="beyond" className={`scroll-mt-20 ${SECTION_SPACING}`}>
+      <div className={CONTAINER}>
         <div className="grid grid-cols-2 items-stretch gap-4 lg:grid-cols-4">
           <PianoVideoQuadrant />
-          <RecentCommitsWidget {...githubActivity} />
+          <ActivityWidget github={githubActivity} leetcode={leetcodeActivity} />
           <div className="col-span-2 lg:col-span-2"><TypeRacerWidget /></div>
           <div className="col-span-2 lg:col-span-1"><ClickMeWidget /></div>
           <WeatherWidget />
@@ -536,9 +818,8 @@ function BeyondSection({ githubActivity }: { githubActivity: GithubActivity }) {
   );
 }
 
-export default function HomeClient({ initialViews, githubActivity }: { initialViews: number; githubActivity: GithubActivity }) {
+export default function HomeClient({ initialViews, githubActivity, leetcodeActivity }: { initialViews: number; githubActivity: GithubActivity; leetcodeActivity: LeetcodeActivity }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activePhoto, setActivePhoto] = useState(0);
   const siteViews = initialViews;
 
   const navLinks = [
@@ -547,23 +828,32 @@ export default function HomeClient({ initialViews, githubActivity }: { initialVi
     { id: "experience", href: "#experience" },
   ];
 
-  const CONTAINER = "mx-auto w-full max-w-6xl px-6";
+  // Scroll manually so the section anchor never ends up in the address bar.
+  const scrollToSection = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    const target = document.getElementById(id);
+    if (!target) return;
+
+    event.preventDefault();
+    setMenuOpen(false);
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+  };
 
   return (
     <div className="bg-canvas relative min-h-screen">
       {/* Main content */}
       <div className="relative z-20 font-sans text-white">
         {/* Header */}
-        <header className="fixed top-0 z-[9999] w-full border-b border-subtle bg-canvas py-4 isolate">
+        <header className="fixed top-0 z-[9999] w-full border-b border-subtle bg-[rgba(15,17,21,0.82)] py-4 shadow-[0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-sm isolate">
           <nav className={`relative flex items-center justify-center ${CONTAINER}`}>
             {/* Desktop links */}
-            <ul className="hidden items-center gap-8 text-[11px] uppercase tracking-[0.22em] text-gray-300 md:flex">
+            <ul className="hidden items-center gap-8 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80 md:flex">
               {navLinks.map(({ id, href }) => (
                 <li key={id}>
                   <a
                     href={href}
-                    className="capitalize hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                    onClick={() => setMenuOpen(false)}
+                    className="capitalize transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    onClick={(event) => scrollToSection(event, id)}
                   >
                     {id}
                   </a>
@@ -573,7 +863,7 @@ export default function HomeClient({ initialViews, githubActivity }: { initialVi
 
             {/* Mobile hamburger */}
             <button
-              className="md:hidden rounded border border-white/20 px-3 py-1.5 text-[11px] uppercase tracking-[0.22em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="md:hidden rounded border border-strong px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               onClick={() => setMenuOpen((s) => !s)}
               aria-expanded={menuOpen}
               aria-controls="mobile-navigation"
@@ -595,8 +885,8 @@ export default function HomeClient({ initialViews, githubActivity }: { initialVi
                     <li key={id}>
                       <a
                         href={href}
-                        onClick={() => setMenuOpen(false)}
-                        className="block px-4 py-2 text-[11px] uppercase tracking-[0.22em] hover:bg-white/5 focus-visible:outline-none focus-visible:bg-white/10"
+                        onClick={(event) => scrollToSection(event, id)}
+                        className="block px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/90 hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:bg-white/10"
                       >
                         {id}
                       </a>
@@ -613,39 +903,54 @@ export default function HomeClient({ initialViews, githubActivity }: { initialVi
           {/* Home */}
           <section
             id="home"
-            className={`relative scroll-mt-20 pt-28 pb-20 md:pt-32 ${CONTAINER}`}
+            className={`relative scroll-mt-20 pt-24 md:pt-28 ${SECTION_SPACING} ${CONTAINER}`}
           >
-            <div className="relative mx-auto flex w-full max-w-5xl flex-col items-center gap-6 lg:flex-row lg:items-center lg:gap-10">
-              <div className="w-full text-left lg:w-auto">
+            <div className="relative grid w-full grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-6">
+              <div className="w-full max-w-xl text-left lg:w-auto">
                 <h1 className="whitespace-nowrap text-4xl font-semibold tracking-[-0.05em] text-white md:text-5xl xl:text-6xl">
                   Hi, I&rsquo;m Daniel
                 </h1>
 
-                <p className="mx-auto mt-2 inline-flex items-center gap-2 whitespace-nowrap text-base font-normal leading-relaxed text-gray-200 md:text-[1.1rem] lg:mx-0">
-                  <span>a recent CS graduate from UC Irvine</span>
-                  <TransparentLogo
-                    src="/Images/anteater.png"
-                    alt="UC Irvine"
-                    className="h-5 w-auto object-contain md:h-6"
-                  />
-                </p>
-
-                <p className="mx-auto mt-2 whitespace-nowrap text-base font-normal leading-relaxed text-gray-200 md:text-[1.1rem] lg:mx-0">
-                  a Software Engineer @ TBD
-                </p>
-
-                <p className="mx-auto mt-2 inline-flex items-center gap-1.5 whitespace-nowrap text-base font-normal leading-relaxed text-gray-200 md:text-[1.1rem] lg:mx-0">
-                  <span>based in Birmingham, Alabama</span>
-                  <span aria-hidden="true">📍</span>
-                  <UsFlagIcon aria-label="United States" />
-                  <TwFlagIcon aria-label="Taiwan" />
-                </p>
+                <ul className="mt-5 space-y-3 text-base font-normal leading-relaxed text-gray-200 md:text-[1.1rem] lg:mx-0">
+                  <li className="flex items-center gap-2">
+                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/60" aria-hidden="true" />
+                    <span>Recent CS graduate from UC Irvine</span>
+                    <TransparentLogo
+                      src="/Images/anteater.png"
+                      alt="UC Irvine"
+                      className="h-5 w-auto object-contain md:h-6"
+                    />
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/60" aria-hidden="true" />
+                    <span>Instructor @ Coding Mind</span>
+                    <NextImage
+                      src="/Images/Experience/CodingMind.jpg"
+                      alt="Coding Mind"
+                      width={80}
+                      height={22}
+                      className="h-5 w-auto object-contain md:h-6"
+                    />
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/60" aria-hidden="true" />
+                    <span>Aspiring SWE/DE</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/60" aria-hidden="true" />
+                    <span>Based in Birmingham, Alabama</span>
+                    <span aria-hidden="true">📍</span>
+                    <UsFlagIcon aria-label="United States" />
+                    <TwFlagIcon aria-label="Taiwan" />
+                  </li>
+                </ul>
 
                 <div className="mt-8 flex flex-wrap items-center justify-start gap-4">
                   <a
-                    href="/DanielCoyleResume.pdf"
-                    download
-                    className="inline-flex h-10 items-center gap-3 rounded-md border border-white/20 px-4 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-black"
+                    href="/resume.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-10 items-center gap-3 rounded-md border border-strong px-4 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-black"
                   >
                     Resume
                     <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="1.8">
@@ -657,7 +962,7 @@ export default function HomeClient({ initialViews, githubActivity }: { initialVi
                     href="mailto:danieljcoyle02@gmail.com"
                     aria-label="Email Daniel Coyle"
                     title="Email Daniel Coyle"
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-white/20 text-white transition-colors hover:bg-white hover:text-black"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-strong text-white transition-colors hover:bg-white hover:text-black"
                   >
                     <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="1.8">
                       <rect x="3" y="5" width="18" height="14" rx="2" />
@@ -668,78 +973,45 @@ export default function HomeClient({ initialViews, githubActivity }: { initialVi
                     href="https://www.linkedin.com/in/danieljcoyle/"
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label="LinkedIn"
+                    title="LinkedIn"
+                    className="group/social inline-flex h-10 w-10 items-center justify-center rounded-md border border-strong transition-colors hover:bg-white"
                   >
                     <NextImage
                       src="/Images/Image2.svg"
-                      alt="LinkedIn"
+                      alt=""
                       width={36}
                       height={36}
-                      className="h-9 w-9 grayscale opacity-70 transition-opacity hover:opacity-100"
+                      className="h-5 w-5 transition-all group-hover/social:invert"
                     />
                   </a>
                   <a
                     href="https://github.com/XiaoDanny"
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label="GitHub"
+                    title="GitHub"
+                    className="group/social inline-flex h-10 w-10 items-center justify-center rounded-md border border-strong transition-colors hover:bg-white"
                   >
                     <NextImage
                       src="/Images/Image3.svg"
-                      alt="GitHub"
+                      alt=""
                       width={36}
                       height={36}
-                      className="h-9 w-9 grayscale opacity-70 transition-opacity hover:opacity-100"
+                      className="h-5 w-5 transition-all group-hover/social:invert"
                     />
                   </a>
                 </div>
               </div>
 
-              <div className="relative z-0 flex shrink-0 justify-center lg:absolute lg:left-3/4 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2">
-                <div className="flex flex-col items-center gap-3" aria-label="Photo carousel">
-                  <button
-                    type="button"
-                    onClick={() => setActivePhoto((current) => (current + 1) % photos.length)}
-                    aria-label={`Show next photo. Currently showing photo ${activePhoto + 1} of ${photos.length}`}
-                    className="relative h-[260px] w-[186px] cursor-pointer appearance-none border-0 bg-transparent p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--background)] md:h-[288px] md:w-[206px]"
-                  >
-                    {photos.map((photo, photoIndex) => {
-                      const position = (photoIndex - activePhoto + photos.length) % photos.length;
-                      const positionStyles = [
-                        { transform: "translate(0px, 0px) rotate(-1.5deg)",  zIndex: 40, opacity: 1 },
-                        { transform: "translate(10px, 6px) rotate(4deg)",    zIndex: 30, opacity: 0.92 },
-                        { transform: "translate(20px, 12px) rotate(9deg)",   zIndex: 20, opacity: 0.72 },
-                        { transform: "translate(30px, 18px) rotate(13.5deg)",zIndex: 10, opacity: 0.48 },
-                      ];
-                      const { transform, zIndex, opacity } = positionStyles[position];
-
-                      return (
-                        <div
-                          key={photo.src}
-                          style={{ transform, zIndex, opacity }}
-                          className="absolute inset-0 bg-[#f2ede6] px-[10px] pt-[10px] pb-[36px] transition-all duration-500 ease-[cubic-bezier(.4,0,.2,1)]"
-                        >
-                          <div className="relative h-full w-full overflow-hidden">
-                            <NextImage
-                              src={photo.src}
-                              alt={photo.alt}
-                              fill
-                              sizes="206px"
-                              style={{ objectPosition: photo.objectPosition }}
-                              className="object-cover"
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </button>
-                </div>
-              </div>
+              <PhotoStack />
             </div>
 
           </section>
           {/* Projects Section */}
           <section
             id="projects"
-            className={`scroll-mt-20 pb-12 ${CONTAINER}`}
+            className={`scroll-mt-20 ${SECTION_SPACING} ${CONTAINER}`}
           >
             <Projects />
           </section>
@@ -747,17 +1019,16 @@ export default function HomeClient({ initialViews, githubActivity }: { initialVi
           {/* ── Experience Section ── */}
           <section
             id="experience"
-            className={`scroll-mt-20 py-12 ${CONTAINER}`}
+            className={`scroll-mt-20 ${SECTION_SPACING} ${CONTAINER}`}
           >
-            <div className="mx-auto w-full max-w-5xl">
-              <h2 className="text-2xl md:text-3xl font-bold mb-8">Experience</h2>
-              <Experience />
-            </div>
+            <h2 className="text-2xl md:text-3xl font-bold mb-8">Experience</h2>
+            <Experience />
           </section>
 
-          <BeyondSection githubActivity={githubActivity} />
+          <BeyondSection githubActivity={githubActivity} leetcodeActivity={leetcodeActivity} />
         </main>
-        <footer className="mx-4 mb-4 mt-8 flex w-auto max-w-6xl flex-col gap-5 rounded-xl border border-subtle bg-surface px-5 py-5 text-xs text-gray-400 sm:mx-auto sm:px-6 sm:py-4 lg:flex-row lg:items-center lg:justify-between">
+        <footer className={`${CONTAINER} mb-4`}>
+          <div className="bg-canvas flex w-full flex-col gap-5 rounded-xl border border-subtle px-5 py-5 text-xs text-gray-400 sm:px-6 sm:py-4 lg:flex-row lg:items-center lg:justify-between">
           <p className="text-center font-mono tracking-wide text-[var(--accent-gold)] lg:text-left">© 2026 Daniel Coyle</p>
           <div className="flex flex-col items-center gap-4 lg:flex-row lg:justify-end">
             <span className="inline-flex items-center gap-1.5 font-mono tracking-wide">
@@ -780,6 +1051,7 @@ export default function HomeClient({ initialViews, githubActivity }: { initialVi
             <a href="https://www.twitch.tv/xiaodannylol" target="_blank" rel="noopener noreferrer" aria-label="Twitch" title="Twitch" className="text-gray-400 transition-colors hover:text-white">
               <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-current"><path d="M4 2h18v13l-5 5h-4l-3 3v-3H4V2Zm2 2v14h4v1.2l1.2-1.2h4l3.8-3.8V4H6Zm3 3h2v5H9V7Zm4 0h2v5h-2V7Z" /></svg>
             </a>
+          </div>
           </div>
           </div>
         </footer>

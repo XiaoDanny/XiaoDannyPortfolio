@@ -58,6 +58,7 @@ const ENTRIES: Entry[] = [
 ];
 
 const NODE_R = 7; // node dot radius
+const CARD_W = 256; // expanded card width (w-64), used to keep edge cards inside the timeline
 
 // Peak positions on mountainRange.png, as % of the image's width/height, left → right
 // (exact tips found by scanning the actual asset for each region's topmost silhouette pixel)
@@ -129,10 +130,10 @@ function MobileTimeline({
               <div className="min-w-0 flex-1 pb-1">
                 <button
                   onClick={() => setActive(isActive ? null : i)}
-                  className={`w-full text-left rounded-xl border p-3 transition-all duration-200 ${
+                  className={`w-full text-left rounded-xl border border-strong bg-canvas p-3 transition-all duration-200 ${
                     isActive
-                      ? "animate-[experience-pop_300ms_ease-out] border-white/20"
-                      : "border-white/10 bg-white/[0.03] active:bg-white/[0.05]"
+                      ? "animate-[experience-pop_300ms_ease-out]"
+                      : "active:bg-white/[0.05]"
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
@@ -286,9 +287,23 @@ function MountainTimeline({
   // Left → right reads oldest → newest, so reverse the newest-first ENTRIES order
   const timeline = [...ENTRIES].reverse();
   const peaks = pickPeaks(timeline.length);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+
+    const observer = new ResizeObserver(([entry]) => setContainerWidth(entry.contentRect.width));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="relative mx-auto mt-20 hidden aspect-[1755/896] w-full lg:block">
+    // mountainRange.png has ~19.5% empty space below the ridge line; the negative margin
+    // (≈10% of width, matching the image ratio) reclaims it so the gap below matches other sections.
+    // That overlap sits on top of the next section, so pointer events are off except on the peaks.
+    <div ref={containerRef} className="pointer-events-none relative mx-auto -mb-[10%] mt-20 hidden aspect-[1755/896] w-full lg:block">
       {/* Background layer — stars + mountain, isolated into their own stacking context so
           nothing in here can ever paint above the foreground content layer below */}
       <div className="absolute inset-0 z-0" style={{ isolation: "isolate" }}>
@@ -299,19 +314,26 @@ function MountainTimeline({
         />
       </div>
 
-      {/* Foreground layer — all experience content, definitively above the background layer */}
-      <div className="absolute inset-0 z-10" style={{ isolation: "isolate" }}>
+      {/* Foreground layer — all experience content, definitively above the background layer.
+          pointer-events are off here because the negative bottom margin overlaps the next
+          section; only the peak groups below opt back in. */}
+      <div className="pointer-events-none absolute inset-0 z-10" style={{ isolation: "isolate" }}>
       {timeline.map((entry, i) => {
         const originalIndex = ENTRIES.length - 1 - i;
         const isActive       = active === originalIndex;
         const color          = ACCENT[entry.type];
         const { x, y }       = peaks[i];
         const stemHeight     = isActive ? 112 : 44;
+        // Edge peaks would push the 256px card outside the timeline, so nudge it back inside.
+        const cardCenter     = (x / 100) * containerWidth;
+        const cardShift      = !isActive || !containerWidth
+          ? 0
+          : Math.max(0, CARD_W / 2 - cardCenter) + Math.min(0, containerWidth - (cardCenter + CARD_W / 2));
 
         return (
           <div
             key={entry.company}
-            className="absolute"
+            className="pointer-events-auto absolute"
             style={{ left: `${x}%`, top: `${y}%` }}
           >
             {/* Stem — grows taller & accent-colored when expanded, rooted exactly at the peak tip */}
@@ -335,13 +357,14 @@ function MountainTimeline({
 
             {/* Pill (collapsed) or card (expanded), floating above the stem */}
             <div
-              className="absolute left-1/2 -translate-x-1/2 transition-[bottom] duration-300 ease-out"
+              className="absolute left-1/2 transition-[bottom] duration-300 ease-out"
               style={{
                 bottom: stemHeight + 8,
+                transform: `translateX(calc(-50% + ${cardShift}px))`,
               }}
             >
               {isActive ? (
-                <div className="w-64 animate-[experience-pop_300ms_ease-out] rounded-xl border border-white/20 bg-[var(--surface)] p-4 text-left">
+                <div className="bg-canvas w-64 animate-[experience-pop_300ms_ease-out] rounded-xl border border-subtle p-4 text-left">
                   <div className="flex items-center gap-2.5">
                     <NextImage
                       src={entry.image}
@@ -369,7 +392,7 @@ function MountainTimeline({
               ) : (
                 <button
                   onClick={() => setActive(originalIndex)}
-                  className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-white/10 bg-[var(--surface)]/90 px-3 py-1.5 text-[11px] font-medium text-gray-300 shadow-md transition-colors hover:border-white/25 hover:text-white"
+                  className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-strong bg-[var(--background)]/90 px-3 py-1.5 text-[11px] font-medium text-gray-300 shadow-md transition-colors hover:border-white/45 hover:text-white"
                 >
                   <NextImage src={entry.image} alt="" width={16} height={16} className="h-4 w-4 flex-shrink-0 rounded-full object-cover" />
                   <div className="flex flex-col items-center leading-tight">
@@ -389,7 +412,8 @@ function MountainTimeline({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function Experience() {
-  const [active, setActive] = useState<number | null>(null);
+  // ENTRIES is newest-first, so 0 opens the latest role — doubles as a hint that peaks are clickable.
+  const [active, setActive] = useState<number | null>(0);
 
   return (
     <>

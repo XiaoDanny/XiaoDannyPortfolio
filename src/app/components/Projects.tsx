@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 interface ProjectEntry {
@@ -77,18 +77,20 @@ function FeaturedProjectCard({ project }: { project: ProjectEntry }) {
   return (
     <article
       onClick={() => setShowDetails((current) => !current)}
-      className="group relative aspect-[25/17] w-full cursor-pointer overflow-hidden rounded-[28px] border border-white/10 bg-[var(--surface)] md:cursor-default"
+      className="group bg-canvas relative aspect-[25/17] w-full cursor-pointer overflow-hidden rounded-[28px] border border-subtle md:cursor-default"
     >
       {project.image ? (
-        <Image
-          src={project.image}
-          alt={`${project.name} screenshot`}
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover"
-        />
+        <div className="absolute inset-0">
+          <Image
+            src={project.image}
+            alt={`${project.name} screenshot`}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="h-full w-full object-cover object-center"
+          />
+        </div>
       ) : (
-        <div className="absolute inset-0 bg-[var(--surface)]" />
+        <div className="bg-canvas absolute inset-0" />
       )}
 
       <div
@@ -124,9 +126,9 @@ function FeaturedProjectCard({ project }: { project: ProjectEntry }) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`View ${project.name} on GitHub`}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="group/social flex h-9 w-9 items-center justify-center rounded-full border border-strong text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
-              <Image src="/Images/Image3.svg" alt="" width={16} height={16} className="h-4 w-4 invert" />
+              <Image src="/Images/Image3.svg" alt="" width={16} height={16} className="h-4 w-4 transition-all group-hover/social:invert" />
             </a>
           )}
           {project.demoUrl === "#" && project.githubUrl === "#" && (
@@ -140,7 +142,7 @@ function FeaturedProjectCard({ project }: { project: ProjectEntry }) {
 
 function AllProjectCard({ project }: { project: ProjectEntry }) {
   return (
-    <article className="group relative mx-auto flex h-[300px] w-full max-w-[342px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-colors hover:bg-white/[0.06] sm:h-[320px] lg:h-[320px] lg:max-w-[380px]">
+    <article className="group bg-canvas relative mx-auto flex h-[300px] w-full max-w-[342px] flex-col overflow-hidden rounded-2xl border border-subtle p-6 transition-colors hover:border-white/45 sm:h-[320px] lg:h-[320px] lg:max-w-[380px]">
       <div className="flex items-start justify-between gap-3">
         <h3 className="text-lg font-semibold text-white">{project.name}</h3>
 
@@ -150,9 +152,9 @@ function AllProjectCard({ project }: { project: ProjectEntry }) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`View ${project.name} on GitHub`}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="group/social flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-strong bg-black/40 text-white backdrop-blur transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
-            <Image src="/Images/Image3.svg" alt="" width={16} height={16} className="h-4 w-4 invert" />
+            <Image src="/Images/Image3.svg" alt="" width={16} height={16} className="h-4 w-4 transition-all group-hover/social:invert" />
           </a>
         )}
       </div>
@@ -167,7 +169,7 @@ function AllProjectCard({ project }: { project: ProjectEntry }) {
           {project.technologies.map((tech) => (
             <span
               key={tech}
-              className="rounded-full border border-white/15 px-2 py-0.5 text-xs text-gray-300"
+              className="rounded-full border border-subtle px-2 py-0.5 text-xs text-gray-300"
             >
               {tech}
             </span>
@@ -180,9 +182,21 @@ function AllProjectCard({ project }: { project: ProjectEntry }) {
 
 export default function Projects() {
   const [showAllProjects, setShowAllProjects] = useState(false);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [gridHeight, setGridHeight] = useState<number>();
+
+  // Track the active grid's natural height so the container can animate between the two layouts.
+  useEffect(() => {
+    const element = gridRef.current;
+    if (!element) return;
+
+    const observer = new ResizeObserver(([entry]) => setGridHeight(entry.contentRect.height));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="mx-auto w-full max-w-5xl">
+    <div className="w-full">
       <div className="mb-8 flex items-center justify-between gap-4">
         <h2 className="text-2xl font-bold text-white md:text-3xl">
           {showAllProjects ? "All" : "Featured"}
@@ -190,25 +204,35 @@ export default function Projects() {
         <button
           type="button"
           onClick={() => setShowAllProjects((current) => !current)}
-          className="shrink-0 rounded-full border border-white/15 bg-white/[0.03] px-5 py-2 text-xs uppercase tracking-[0.24em] text-gray-300 transition-colors hover:border-white/30 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          aria-expanded={showAllProjects}
+          className="inline-flex h-10 shrink-0 items-center rounded-md border border-strong px-4 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
         >
           {showAllProjects ? "View Featured" : "View All Projects"}
         </button>
       </div>
 
-      {showAllProjects ? (
-        <div className="grid grid-cols-1 justify-items-center gap-6 lg:grid-cols-3">
-          {projects.map((project) => (
-            <AllProjectCard key={project.name} project={project} />
-          ))}
+      <div
+        style={{ height: gridHeight }}
+        className="overflow-hidden transition-[height] duration-500 ease-[cubic-bezier(.4,0,.2,1)] motion-reduce:transition-none"
+      >
+        <div ref={gridRef}>
+          <div key={showAllProjects ? "all" : "featured"} className="project-swap-in">
+            {showAllProjects ? (
+              <div className="grid grid-cols-1 justify-items-center gap-6 lg:grid-cols-3">
+                {projects.map((project) => (
+                  <AllProjectCard key={project.name} project={project} />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {featuredProjects.map((project) => (
+                  <FeaturedProjectCard key={project.name} project={project} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {featuredProjects.map((project) => (
-            <FeaturedProjectCard key={project.name} project={project} />
-          ))}
-        </div>
-      )}
+      </div>
     </div>
   );
 }
