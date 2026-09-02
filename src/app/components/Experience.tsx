@@ -369,10 +369,13 @@ function MountainTimeline({
               ) : (
                 <button
                   onClick={() => setActive(originalIndex)}
-                  className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-white/10 bg-[var(--surface)]/90 px-3 py-1.5 text-[11px] font-medium leading-none text-gray-300 shadow-md transition-colors hover:border-white/25 hover:text-white"
+                  className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-white/10 bg-[var(--surface)]/90 px-3 py-1.5 text-[11px] font-medium text-gray-300 shadow-md transition-colors hover:border-white/25 hover:text-white"
                 >
                   <NextImage src={entry.image} alt="" width={16} height={16} className="h-4 w-4 flex-shrink-0 rounded-full object-cover" />
-                  <span>{entry.company}</span>
+                  <div className="flex flex-col items-center leading-tight">
+                    <span>{entry.company}</span>
+                    <span className="text-[9px] text-gray-500">{entry.role}</span>
+                  </div>
                 </button>
               )}
             </div>

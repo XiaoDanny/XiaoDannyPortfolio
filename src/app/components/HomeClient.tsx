@@ -403,20 +403,22 @@ function RecentCommitsWidget({ commits, languages, languageTimeframeLabel }: Git
         ))}
       </ul>
 
-      <div className="mt-auto border-t border-white/10 pt-3">
-        <p className="text-[11px] uppercase tracking-[0.14em] text-gray-400">{languageTimeframeLabel}</p>
-        <div className="mt-2 space-y-1.5">
-          {languages.map((lang) => (
-            <div key={lang.name} className="flex items-center gap-2 text-[10px] text-gray-400">
-              <span className="w-[68px] shrink-0 truncate text-gray-300">{lang.name}</span>
-              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-white/70" style={{ width: `${lang.pct}%` }} />
+      {languages.length > 0 && (
+        <div className="mt-auto border-t border-white/10 pt-3">
+          <p className="text-[11px] uppercase tracking-[0.14em] text-gray-400">{languageTimeframeLabel}</p>
+          <div className="mt-2 space-y-1.5">
+            {languages.map((lang) => (
+              <div key={lang.name} className="flex items-center gap-2 text-[10px] text-gray-400">
+                <span className="w-[68px] shrink-0 truncate text-gray-300">{lang.name}</span>
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
+                  <div className="h-full rounded-full bg-white/70" style={{ width: `${lang.pct}%` }} />
+                </div>
+                <span className="w-8 shrink-0 text-right tabular-nums text-gray-500">{lang.pct}%</span>
               </div>
-              <span className="w-8 shrink-0 text-right tabular-nums text-gray-500">{lang.pct}%</span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

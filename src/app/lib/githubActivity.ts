@@ -28,6 +28,20 @@ const GITHUB_USER = "XiaoDanny";
 const COMMIT_COUNT = 3;
 const ACTIVITY_WINDOW_DAYS = 90;
 const REVALIDATE_SECONDS = 3600; // refresh at most once an hour
+const NON_CODE_LANGUAGES = new Set([
+  "CSS",
+  "HTML",
+  "JSON",
+  "Less",
+  "Markdown",
+  "MDX",
+  "SCSS",
+  "Sass",
+  "SVG",
+  "TOML",
+  "XML",
+  "YAML",
+]);
 
 const FALLBACK_ACTIVITY: GithubActivity = {
   commits: [
@@ -111,13 +125,14 @@ async function getLanguageBreakdown(): Promise<LanguageStat[]> {
     repos.map(async (repo) => {
       const languages = await githubFetch(`https://api.github.com/repos/${repo}/languages`).catch(() => ({})) as Record<string, number>;
       for (const [name, bytes] of Object.entries(languages)) {
+        if (NON_CODE_LANGUAGES.has(name)) continue;
         byteTotals.set(name, (byteTotals.get(name) ?? 0) + bytes);
       }
     }),
   );
 
   const totalBytes = [...byteTotals.values()].reduce((sum, bytes) => sum + bytes, 0);
-  if (totalBytes === 0) return FALLBACK_ACTIVITY.languages;
+  if (totalBytes === 0) return [];
 
   const sorted = [...byteTotals.entries()].sort((a, b) => b[1] - a[1]);
   const top = sorted.slice(0, 3);
