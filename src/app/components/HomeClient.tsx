@@ -226,20 +226,20 @@ function TypeRacerWidget() {
   }
 
   return (
-    <div className="relative flex h-[260px] min-h-[260px] flex-col rounded-xl border border-white/10 bg-canvas p-4 text-left">
+    <div className="relative flex min-h-[220px] flex-col rounded-xl border border-white/10 bg-canvas p-3 text-left sm:min-h-[260px] sm:p-4">
       <button
         type="button"
         onClick={nextSentence}
         aria-label="Skip to the next sentence"
         title="Next Sentence"
-        className="absolute right-3 top-3 z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        className="absolute right-2 top-2 z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:right-3 sm:top-3 sm:h-9 sm:w-9"
       >
         <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="1.8">
           <path d="M20 5v5h-5M20 10a8 8 0 1 0 2 5.3" />
         </svg>
       </button>
-      <div className="flex min-h-[88px] items-center pr-10">
-        <div className="break-words whitespace-pre-wrap font-mono text-sm leading-relaxed tracking-wide text-gray-300">
+      <div className="flex min-h-[64px] items-center pr-8 sm:min-h-[88px] sm:pr-10">
+        <div className="break-words whitespace-pre-wrap font-mono text-xs leading-relaxed tracking-wide text-gray-300 sm:text-sm">
           {raceText.split("").map((character, index) => {
             const typedCharacter = typed[index];
             const isCurrent = index === typed.length && isFocused && finishedTime === null;
@@ -252,7 +252,7 @@ function TypeRacerWidget() {
           })}
         </div>
       </div>
-      <div className="flex flex-1 items-center">
+      <div className="mt-2 flex items-center sm:mt-0 sm:flex-1">
         <input
         ref={inputRef}
         onChange={(event) => handleChange(event.target.value)}
@@ -274,13 +274,13 @@ function TypeRacerWidget() {
         readOnly={finishedTime !== null}
         aria-label="TypeRacer input"
         placeholder="Start typing here..."
-        className="w-full cursor-text rounded-md border border-white/15 bg-transparent px-3 py-2 text-sm font-mono text-white outline-none transition-colors placeholder:text-gray-600 focus:border-white/40 disabled:opacity-60"
+        className="w-full cursor-text rounded-md border border-white/15 bg-transparent px-2.5 py-1.5 text-xs font-mono text-white outline-none transition-colors placeholder:text-gray-600 focus:border-white/40 disabled:opacity-60 sm:px-3 sm:py-2 sm:text-sm"
         />
       </div>
-      <div className="flex h-8 items-center justify-between text-[11px] uppercase tracking-[0.13em] text-gray-400">
-        {isFocused && finishedTime === null && <><span className="text-base font-semibold tracking-normal text-gray-300">{elapsed.toFixed(2)}</span><span>Tab to restart</span></>}
+      <div className="mt-2 flex h-6 items-center justify-between text-[10px] uppercase tracking-[0.1em] text-gray-400 sm:mt-0 sm:h-8 sm:text-[11px] sm:tracking-[0.13em]">
+        {isFocused && finishedTime === null && <><span className="text-sm font-semibold tracking-normal text-gray-300 sm:text-base">{elapsed.toFixed(2)}</span><span>Tab to restart</span></>}
       </div>
-      <div className="h-12">
+      <div className="h-10 sm:h-12">
         {finishedTime !== null && (
         <div className="animate-[vote-confirm_220ms_ease-out] pt-1 text-[10px] uppercase tracking-[0.13em] text-gray-500">
           <p className="mt-2">Site Record: <strong className="font-medium text-gray-300">{siteRecord.toFixed(2)}</strong></p>
@@ -525,8 +525,8 @@ function BeyondSection({ githubActivity }: { githubActivity: GithubActivity }) {
         <div className="grid grid-cols-2 items-stretch gap-4 lg:grid-cols-4">
           <PianoVideoQuadrant />
           <RecentCommitsWidget {...githubActivity} />
-          <div className="col-span-1 lg:col-span-2"><TypeRacerWidget /></div>
-          <ClickMeWidget />
+          <div className="col-span-2 lg:col-span-2"><TypeRacerWidget /></div>
+          <div className="col-span-2 lg:col-span-1"><ClickMeWidget /></div>
           <WeatherWidget />
         </div>
       </div>
