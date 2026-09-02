@@ -168,8 +168,6 @@ function TypeRacerWidget() {
     return () => window.clearInterval(interval);
   }, [startedAt, finishedTime]);
 
-  const hasStarted = startedAt !== null;
-
   function handleChange(value: string) {
     if (value.length > raceText.length || finishedTime !== null) return;
     if (!startedAt && value) setStartedAt(Date.now());
