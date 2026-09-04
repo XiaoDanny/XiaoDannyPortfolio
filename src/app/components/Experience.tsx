@@ -50,7 +50,7 @@ const ENTRIES: Entry[] = [
   company:     "UCI Esports",
   role:        "Scholarship Athlete",
   date:        "Mar 2022 – Jun 2025",
-  description: "Competed at a professional level while completing a Computer Science degree, balancing a demanding dual commitment.",
+  description: "Competed on the League of Legends team at a professional level (Challenger rank) while completing a Computer Science degree, balancing competitive play with a rigorous courseload.",
   website:     "https://esports.uci.edu/",
   image:       "/Images/Experience/UCIesports.png",
   type:        "other",

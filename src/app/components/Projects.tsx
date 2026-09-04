@@ -16,17 +16,17 @@ interface ProjectEntry {
 }
 
 const projects: ProjectEntry[] = [
-  {
-    name: "Alpha Ring",
-    description:
-      "An open source mod that restores local split screen co op to Halo: The Master Chief Collection on PC, used by thousands of players. Contributing UI fixes and new features.",
-    date: "July 2026 - Present",
-    technologies: ["C++", "CMake"],
-    featured: true,
-    demoUrl: "https://www.youtube.com/watch?v=IRZPdAJFkc8",
-    githubUrl: "https://github.com/megabitt01/AlphaRing/tree/xiaodanny",
-    image: "/Images/Projects/AlphaRing.png",
-  },
+{
+  name: "Alpha Ring",
+  description:
+    "An open source mod that restores local split-screen co-op to Halo: The Master Chief Collection on PC, used by thousands of players. Built by reverse-engineering the closed-source game engine and hooking into it at runtime.",
+  date: "July 2026 - Present",
+  technologies: ["C++", "CMake"],
+  featured: true,
+  demoUrl: "https://www.youtube.com/watch?v=IRZPdAJFkc8",
+  githubUrl: "https://github.com/megabitt01/AlphaRing/tree/xiaodanny",
+  image: "/Images/Projects/AlphaRing.png",
+},
   {
     name: "SQL Duel",
     description:
