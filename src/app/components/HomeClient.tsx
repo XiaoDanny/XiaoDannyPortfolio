@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import NextImage from "next/image";
 import Projects from "./Projects";
 import Experience from "./Experience";
+import Spine from "./Spine";
 import { CONTAINER } from "./Container";
 import { type GithubActivity } from "../lib/githubActivity";
 import { type LeetcodeActivity, type LeetcodeDay } from "../lib/leetcodeActivity";
@@ -92,80 +93,6 @@ function PhotoStack() {
       </div>
     </div>
   );
-}
-
-// Inline flag icons so flags render as pictures (Windows falls back to plain "US"/"TW" text for emoji flags)
-function UsFlagIcon({ "aria-label": ariaLabel }: { "aria-label": string }) {
-  return (
-    <svg viewBox="0 0 20 14" width="16" height="12" role="img" aria-label={ariaLabel} className="shrink-0 rounded-[2px]">
-      <rect width="20" height="14" fill="#B22234" />
-      {[1, 3, 5, 7, 9, 11].map((y) => (
-        <rect key={y} y={y} width="20" height="1" fill="#fff" />
-      ))}
-      <rect width="8" height="7" fill="#3C3B6E" />
-    </svg>
-  );
-}
-
-function TwFlagIcon({ "aria-label": ariaLabel }: { "aria-label": string }) {
-  return (
-    <svg viewBox="0 0 20 14" width="16" height="12" role="img" aria-label={ariaLabel} className="shrink-0 rounded-[2px]">
-      <rect width="20" height="14" fill="#FE0000" />
-      <rect width="10" height="7" fill="#000095" />
-      <circle cx="5" cy="3.5" r="2.1" fill="#fff" />
-      <circle cx="5" cy="3.5" r="1" fill="#000095" />
-    </svg>
-  );
-}
-
-// Strips the flat white background from a logo via flood fill, leaving only the artwork (like an emoji with no backing box)
-function TransparentLogo({ src, alt, className }: { src: string; alt: string; className?: string }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) return;
-
-    const img = new Image();
-    img.src = src;
-    img.onload = () => {
-      const { naturalWidth: width, naturalHeight: height } = img;
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(img, 0, 0);
-
-      const imageData = ctx.getImageData(0, 0, width, height);
-      const { data } = imageData;
-      const isNearWhite = (i: number) => data[i] > 235 && data[i + 1] > 235 && data[i + 2] > 235;
-
-      // Flood fill from the border inward so only the connected background is
-      // removed, leaving any white artwork (e.g. lettering) inside the logo intact
-      const visited = new Uint8Array(width * height);
-      const stack: number[] = [];
-      for (let x = 0; x < width; x++) stack.push(x, x + (height - 1) * width);
-      for (let y = 0; y < height; y++) stack.push(y * width, y * width + (width - 1));
-
-      while (stack.length) {
-        const p = stack.pop()!;
-        if (visited[p]) continue;
-        visited[p] = 1;
-        const i = p * 4;
-        if (!isNearWhite(i)) continue;
-        data[i + 3] = 0;
-        const x = p % width;
-        const y = (p - x) / width;
-        if (x > 0) stack.push(p - 1);
-        if (x < width - 1) stack.push(p + 1);
-        if (y > 0) stack.push(p - width);
-        if (y < height - 1) stack.push(p + width);
-      }
-
-      ctx.putImageData(imageData, 0, 0);
-    };
-  }, [src]);
-
-  return <canvas ref={canvasRef} role="img" aria-label={alt} className={className} />;
 }
 
 const RACE_TEXTS = [
@@ -762,33 +689,18 @@ function useWeather(): { data: WeatherData | null; loading: boolean; error: bool
   return { data, loading, error };
 }
 
-function WeatherWidget() {
-  const { data, loading, error } = useWeather();
-  const condition = data?.code === 0 ? "Clear" : data?.code !== undefined && data.code < 4 ? "Partly cloudy" : data?.code !== undefined && data.code < 80 ? "Cloudy" : data?.code !== undefined && data.code < 83 ? "Rain" : data?.code !== undefined && data.code < 86 ? "Snow" : "Storm";
-
-  return (
-    <div className="bg-canvas col-span-2 flex min-h-[220px] flex-col items-center justify-center rounded-xl border border-subtle p-4 text-center lg:col-span-1">
-      <p className="text-[10px] uppercase tracking-[0.18em] text-gray-400">Birmingham, AL</p>
-      <div className="mt-3 flex items-center justify-center gap-4">
-        <WeatherIcon code={data?.code} isDay={data?.isDay ?? true} />
-        <div>
-          <p className="text-2xl font-semibold text-white">{loading ? "--" : data ? `${Math.round(data.temperature)}°F` : "--"}</p>
-          <p className="text-xs text-gray-400">{error ? "Weather unavailable" : loading ? "Loading weather" : condition}</p>
-        </div>
-      </div>
-      {data && !loading && !error && <p className="mt-3 text-center text-[10px] uppercase tracking-[0.14em] text-gray-400">High {Math.round(data.high)}° · Low {Math.round(data.low)}°</p>}
-    </div>
-  );
+function weatherCondition(code?: number): string {
+  return code === 0 ? "Clear" : code !== undefined && code < 4 ? "Partly cloudy" : code !== undefined && code < 80 ? "Cloudy" : code !== undefined && code < 83 ? "Rain" : code !== undefined && code < 86 ? "Snow" : "Storm";
 }
 
-function WeatherIcon({ code, isDay }: { code?: number; isDay: boolean }) {
+function WeatherIcon({ code, isDay, className = "h-12 w-12" }: { code?: number; isDay: boolean; className?: string }) {
   const isClear = code === 0;
   const isRain = code !== undefined && code >= 51 && code <= 67;
   const isSnow = code !== undefined && code >= 71 && code <= 77;
   const isStorm = code !== undefined && code >= 95;
   const color = isClear ? (isDay ? "text-amber-300" : "text-sky-200") : isStorm ? "text-indigo-300" : isRain ? "text-sky-300" : isSnow ? "text-white" : "text-gray-300";
   return (
-    <svg aria-hidden="true" viewBox="0 0 48 48" className={`h-12 w-12 shrink-0 ${color}`} fill="none" stroke="currentColor" strokeWidth="2">
+    <svg aria-hidden="true" viewBox="0 0 48 48" className={`${className} shrink-0 ${color}`} fill="none" stroke="currentColor" strokeWidth="2">
       {isClear ? isDay ? <><circle cx="24" cy="24" r="8" fill="currentColor" stroke="none" />{[0,45,90,135].map((angle) => <path key={angle} d="M24 4v6M24 38v6M4 24h6M38 24h6" transform={`rotate(${angle} 24 24)`} />)}</> : <path d="M31 7a17 17 0 1 0 10 31A17 17 0 0 1 31 7Z" fill="currentColor" stroke="none" /> : isStorm ? <path d="M25 7 14 27h10l-3 14 13-21H24l1-13Z" fill="currentColor" stroke="none" /> : isSnow ? <path d="M24 8v32M10 16l28 16M10 32l28-16M24 8l-3 5m3-5 3 5M24 40l-3-5m3 5 3-5" /> : <><path d="M13 33h23a8 8 0 0 0 0-16 11 11 0 0 0-21-2 8 8 0 0 0-2 18Z" fill="currentColor" fillOpacity=".18" />{isRain && <path d="m18 37-2 5m9-5-2 5m9-5-2 5" />}</>}
     </svg>
   );
@@ -834,13 +746,12 @@ function PianoVideoQuadrant({ latestVideo }: { latestVideo: LatestVideo | null }
 function BeyondSection({ githubActivity, leetcodeActivity, latestVideo }: { githubActivity: GithubActivity; leetcodeActivity: LeetcodeActivity; latestVideo: LatestVideo | null }) {
   return (
     <section id="beyond" className={`scroll-mt-20 ${SECTION_SPACING}`}>
-      <div className={CONTAINER}>
+      <div className={`border-t border-subtle pt-16 ${CONTAINER}`}>
         <div className="grid grid-cols-2 items-stretch gap-4 lg:grid-cols-4">
           <PianoVideoQuadrant latestVideo={latestVideo} />
           <ActivityWidget github={githubActivity} leetcode={leetcodeActivity} />
           <div className="col-span-2 lg:col-span-2"><TypeRacerWidget /></div>
-          <div className="col-span-2 lg:col-span-1"><ClickMeWidget /></div>
-          <WeatherWidget />
+          <div className="col-span-2 lg:col-span-2"><ClickMeWidget /></div>
         </div>
       </div>
     </section>
@@ -850,12 +761,23 @@ function BeyondSection({ githubActivity, leetcodeActivity, latestVideo }: { gith
 export default function HomeClient({ initialViews, githubActivity, leetcodeActivity, latestVideo }: { initialViews: number; githubActivity: GithubActivity; leetcodeActivity: LeetcodeActivity; latestVideo: LatestVideo | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const siteViews = initialViews;
+  const weather = useWeather();
 
-  const navLinks = [
-    { id: "home", href: "#home" },
-    { id: "projects", href: "#projects" },
-    { id: "experience", href: "#experience" },
-  ];
+  // Experience and Beyond are being held back while the new page layout gets nailed down —
+  // flip this back on to bring them back rather than re-deriving the sections/JSX by hand.
+  const SHOW_LATER_SECTIONS = false;
+
+  const sections = SHOW_LATER_SECTIONS
+    ? [
+        { id: "about", label: "About" },
+        { id: "projects", label: "Projects" },
+        { id: "experience", label: "Experience" },
+        { id: "beyond", label: "Beyond" },
+      ]
+    : [
+        { id: "about", label: "About" },
+        { id: "projects", label: "Projects" },
+      ];
 
   // Scroll manually so the section anchor never ends up in the address bar.
   const scrollToSection = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -870,29 +792,15 @@ export default function HomeClient({ initialViews, githubActivity, leetcodeActiv
 
   return (
     <div className="bg-canvas relative min-h-screen">
+      <Spine sections={sections} />
       {/* Main content */}
       <div className="relative z-20 font-sans text-white">
-        {/* Header */}
-        <header className="fixed top-0 z-[9999] w-full border-b border-subtle bg-[rgba(15,17,21,0.82)] py-4 shadow-[0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-sm isolate">
+        {/* Mobile-only header — desktop navigation lives in the Spine instead */}
+        <header className="fixed top-0 z-[9999] w-full border-b border-subtle bg-[rgba(18,18,18,0.82)] py-4 shadow-[0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-sm isolate lg:hidden">
           <nav className={`relative flex items-center justify-center ${CONTAINER}`}>
-            {/* Desktop links */}
-            <ul className="hidden items-center gap-8 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80 md:flex">
-              {navLinks.map(({ id, href }) => (
-                <li key={id}>
-                  <a
-                    href={href}
-                    className="capitalize transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                    onClick={(event) => scrollToSection(event, id)}
-                  >
-                    {id}
-                  </a>
-                </li>
-              ))}
-            </ul>
-
             {/* Mobile hamburger */}
             <button
-              className="md:hidden rounded border border-strong px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="rounded border border-strong px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               onClick={() => setMenuOpen((s) => !s)}
               aria-expanded={menuOpen}
               aria-controls="mobile-navigation"
@@ -904,20 +812,20 @@ export default function HomeClient({ initialViews, githubActivity, leetcodeActiv
             {/* mobile menu panel */}
             <div
               id="mobile-navigation"
-              className={`md:hidden absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 transform transition-all duration-150 ${
+              className={`absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 transform transition-all duration-150 ${
                 menuOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
               }`}
             >
               <div className="bg-surface min-w-[160px] rounded-lg border border-subtle py-2 text-white shadow-lg">
                 <ul className="flex flex-col">
-                  {navLinks.map(({ id, href }) => (
+                  {sections.map(({ id, label }) => (
                     <li key={id}>
                       <a
-                        href={href}
+                        href={`#${id}`}
                         onClick={(event) => scrollToSection(event, id)}
                         className="block px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/90 hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:bg-white/10"
                       >
-                        {id}
+                        {label}
                       </a>
                     </li>
                   ))}
@@ -929,52 +837,36 @@ export default function HomeClient({ initialViews, githubActivity, leetcodeActiv
 
         {/* Sections */}
         <main className="pt-0">
-          {/* Home */}
+          {/* About */}
           <section
-            id="home"
-            className={`relative scroll-mt-20 pt-24 md:pt-28 ${SECTION_SPACING} ${CONTAINER}`}
+            id="about"
+            className={`relative flex scroll-mt-20 items-start pt-24 md:pt-28 lg:min-h-screen lg:items-center lg:pb-0 lg:pt-0 ${SECTION_SPACING} ${CONTAINER}`}
           >
-            <div className="relative grid w-full grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-6">
+            <div className="relative grid w-full grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-3">
               <div className="w-full max-w-xl text-left lg:w-auto">
                 <h1 className="whitespace-nowrap text-4xl font-semibold tracking-[-0.05em] text-white md:text-5xl xl:text-6xl">
                   Hi, I&rsquo;m Daniel
                 </h1>
 
-                <ul className="mt-5 space-y-3 text-base font-normal leading-relaxed text-gray-200 md:text-[1.1rem] lg:mx-0">
-                  <li className="flex items-center gap-2">
-                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/60" aria-hidden="true" />
-                    <span>Recent CS graduate from UC Irvine</span>
-                    <TransparentLogo
-                      src="/Images/anteater.png"
-                      alt="UC Irvine"
-                      className="h-5 w-auto object-contain md:h-6"
-                    />
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/60" aria-hidden="true" />
-                    <span>Instructor @ Coding Mind</span>
-                    <NextImage
-                      src="/Images/Experience/CodingMind.jpg"
-                      alt="Coding Mind"
-                      width={80}
-                      height={22}
-                      className="h-5 w-auto object-contain md:h-6"
-                    />
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/60" aria-hidden="true" />
-                    <span>Aspiring SWE/DE</span>
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/60" aria-hidden="true" />
-                    <span>Based in Birmingham, Alabama</span>
-                    <span aria-hidden="true">📍</span>
-                    <UsFlagIcon aria-label="United States" />
-                    <TwFlagIcon aria-label="Taiwan" />
-                  </li>
-                </ul>
+                <div className="mt-3 flex items-center gap-1.5 text-xs text-gray-400">
+                  <WeatherIcon code={weather.data?.code} isDay={weather.data?.isDay ?? true} className="h-4 w-4" />
+                  <span>
+                    {weather.loading
+                      ? "Loading weather…"
+                      : weather.error || !weather.data
+                      ? "Weather unavailable"
+                      : `Birmingham, AL · ${Math.round(weather.data.temperature)}°F, ${weatherCondition(weather.data.code).toLowerCase()}`}
+                  </span>
+                </div>
 
-                <div className="mt-8 flex flex-wrap items-center justify-start gap-4">
+                <p className="mt-3 max-w-lg text-base font-normal leading-relaxed text-gray-200 md:text-[1.05rem]">
+                  Recent Computer Science graduate from UC Irvine, now instructing at Coding
+                  Mind and building side projects while chasing software engineering / data
+                  engineering roles.
+                </p>
+                <p className="mt-1.5 text-xs italic text-gray-500">— placeholder bio, replace with your own copy</p>
+
+                <div className="mt-6 flex flex-wrap items-center justify-start gap-4">
                   <a
                     href="/resume.pdf"
                     target="_blank"
@@ -1040,21 +932,27 @@ export default function HomeClient({ initialViews, githubActivity, leetcodeActiv
           {/* Projects Section */}
           <section
             id="projects"
-            className={`scroll-mt-20 ${SECTION_SPACING} ${CONTAINER}`}
+            className={`relative flex scroll-mt-20 items-center border-t border-subtle pt-16 lg:min-h-screen ${SECTION_SPACING} ${CONTAINER}`}
           >
-            <Projects />
+            <div className="w-full">
+              <Projects />
+            </div>
           </section>
 
-          {/* ── Experience Section ── */}
-          <section
-            id="experience"
-            className={`scroll-mt-20 ${SECTION_SPACING} ${CONTAINER}`}
-          >
-            <h2 className="text-2xl md:text-3xl font-bold mb-8">Experience</h2>
-            <Experience />
-          </section>
+          {SHOW_LATER_SECTIONS && (
+            <>
+              {/* ── Experience Section ── */}
+              <section
+                id="experience"
+                className={`scroll-mt-20 border-t border-subtle pt-16 ${SECTION_SPACING} ${CONTAINER}`}
+              >
+                <h2 className="text-2xl md:text-3xl font-bold mb-8">Experience</h2>
+                <Experience />
+              </section>
 
-          <BeyondSection githubActivity={githubActivity} leetcodeActivity={leetcodeActivity} latestVideo={latestVideo} />
+              <BeyondSection githubActivity={githubActivity} leetcodeActivity={leetcodeActivity} latestVideo={latestVideo} />
+            </>
+          )}
         </main>
         <footer className={`${CONTAINER} mb-4`}>
           <div className="bg-canvas flex w-full flex-col gap-5 rounded-xl border border-subtle px-5 py-5 text-xs text-gray-400 sm:px-6 sm:py-4 lg:flex-row lg:items-center lg:justify-between">

@@ -3,15 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --background: #0f1115;
-  --surface: #1b2230;
-  --foreground: #f4f6fa;
-  --muted-foreground: #a8b0bf;
+  --background: #121212;
+  --surface: #1e1e1e;
+  --foreground: #f4f4f4;
+  --muted-foreground: #a3a3a3;
   --subtle-border: rgba(255, 255, 255, 0.22);
   /* Interactive controls need a stronger edge than decorative panels (WCAG 1.4.11). */
   --strong-border: rgba(255, 255, 255, 0.34);
   --accent-gold: #C9A227;
-  --accent-border: rgba(201, 162, 39, 0.4);
 }
 
 @keyframes blink {
@@ -126,8 +125,4 @@ body {
 
 .border-strong {
   border-color: var(--strong-border);
-}
-
-.border-accent-subtle {
-  border-color: var(--accent-border);
 }
