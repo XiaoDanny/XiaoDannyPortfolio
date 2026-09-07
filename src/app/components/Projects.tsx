@@ -69,7 +69,7 @@ const projects: ProjectEntry[] = [
   },
 ];
 
-const featuredProjects = projects.filter((project) => project.featured).slice(0, 2);
+const featuredProjects = projects.filter((project) => project.featured).slice(0, 1);
 
 function FeaturedProjectCard({ project }: { project: ProjectEntry }) {
   const [showDetails, setShowDetails] = useState(false);
@@ -224,7 +224,7 @@ export default function Projects() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6">
                 {featuredProjects.map((project) => (
                   <FeaturedProjectCard key={project.name} project={project} />
                 ))}

@@ -25,72 +25,22 @@ function useMediaQuery(query: string) {
   return matches;
 }
 
-const photos = [
-  { src: "/Images/BeyondTheCode/Daniel1.jpg", alt: "Daniel Coyle", objectPosition: "center 35%" },
-  { src: "/Images/BeyondTheCode/Gym.jpg", alt: "Daniel Coyle at the gym", objectPosition: "center 30%" },
-  { src: "/Images/BeyondTheCode/Daniel2.jpg", alt: "Daniel Coyle at Yellowstone National Park", objectPosition: "52% 55%" },
-  { src: "/Images/BeyondTheCode/LookingUp.jpg", alt: "Daniel Coyle, UC Irvine Class of 2025", objectPosition: "30% 30%" },
-];
-
-/** Photo shown first. Change this src to feature a different photo. */
-const FEATURED_PHOTO_SRC = "/Images/BeyondTheCode/Daniel1.jpg";
-
-const STACK_TRANSITION = "transition-all duration-500 ease-[cubic-bezier(.4,0,.2,1)]";
+const AVATAR_SRC = "/Images/BeyondTheCode/Daniel1.jpg";
 
 /** Single vertical rhythm between sections: each owns its bottom gap, none add top padding. */
 const SECTION_SPACING = "pb-16";
 
-function PhotoStack() {
-  const featuredIndex = Math.max(0, photos.findIndex((photo) => photo.src === FEATURED_PHOTO_SRC));
-  const [active, setActive] = useState(featuredIndex);
-
+function Avatar() {
   return (
-    <div className="relative z-0 flex shrink-0 flex-col items-center gap-3">
-      <button
-        type="button"
-        onClick={() => setActive((current) => (current + 1) % photos.length)}
-        aria-label={`Photo ${active + 1} of ${photos.length}: ${photos[active].alt}. Tap for the next photo.`}
-        className={`${STACK_TRANSITION} relative h-[232px] w-[166px] cursor-pointer appearance-none overflow-hidden rounded-2xl border-0 bg-transparent p-0 shadow-[0_18px_45px_-12px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.07)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--background)] md:h-[256px] md:w-[183px] md:hover:scale-[1.02]`}
-      >
-        {photos.map((photo, index) => (
-          <div
-            key={photo.src}
-            aria-hidden={index !== active}
-            className={`${STACK_TRANSITION} absolute inset-0 ${index === active ? "opacity-100" : "opacity-0"}`}
-          >
-            <NextImage
-              src={photo.src}
-              alt={index === active ? photo.alt : ""}
-              fill
-              sizes="206px"
-              style={{ objectPosition: photo.objectPosition }}
-              className="object-cover"
-            />
-          </div>
-        ))}
-      </button>
-
-      <div className="flex items-center gap-1" role="tablist" aria-label="Choose a photo">
-        {photos.map((photo, index) => (
-          <button
-            key={photo.src}
-            type="button"
-            role="tab"
-            aria-selected={index === active}
-            aria-label={`Show photo ${index + 1}: ${photo.alt}`}
-            onClick={() => setActive(index)}
-            className="group cursor-pointer p-1.5 focus-visible:outline-none"
-          >
-            <span
-              className={`${STACK_TRANSITION} block h-1.5 w-1.5 rounded-full ${
-                index === active
-                  ? "bg-white/75"
-                  : "bg-white/20 group-hover:bg-white/40"
-              } group-focus-visible:ring-2 group-focus-visible:ring-white/60 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[var(--background)]`}
-            />
-          </button>
-        ))}
-      </div>
+    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-subtle md:h-24 md:w-24">
+      <NextImage
+        src={AVATAR_SRC}
+        alt="Daniel Coyle"
+        fill
+        sizes="96px"
+        style={{ objectPosition: "center 22%", transform: "scale(1.8)" }}
+        className="object-cover"
+      />
     </div>
   );
 }
@@ -661,51 +611,6 @@ function LeetcodeView({
   );
 }
 
-type WeatherData = {
-  temperature: number;
-  high: number;
-  low: number;
-  code: number;
-  isDay: boolean;
-};
-
-function useWeather(): { data: WeatherData | null; loading: boolean; error: boolean } {
-  const [data, setData] = useState<WeatherData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    fetch("https://api.open-meteo.com/v1/forecast?latitude=33.5186&longitude=-86.8104&current=temperature_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=auto")
-      .then((response) => response.json())
-      .then((data: { current?: { temperature_2m: number; weather_code: number; is_day: number }; daily?: { temperature_2m_max: number[]; temperature_2m_min: number[] } }) => {
-        if (data.current && data.daily) {
-          setData({ temperature: data.current.temperature_2m, code: data.current.weather_code, isDay: data.current.is_day === 1, high: data.daily.temperature_2m_max[0], low: data.daily.temperature_2m_min[0] });
-        } else setError(true);
-      })
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
-  }, []);
-
-  return { data, loading, error };
-}
-
-function weatherCondition(code?: number): string {
-  return code === 0 ? "Clear" : code !== undefined && code < 4 ? "Partly cloudy" : code !== undefined && code < 80 ? "Cloudy" : code !== undefined && code < 83 ? "Rain" : code !== undefined && code < 86 ? "Snow" : "Storm";
-}
-
-function WeatherIcon({ code, isDay, className = "h-12 w-12" }: { code?: number; isDay: boolean; className?: string }) {
-  const isClear = code === 0;
-  const isRain = code !== undefined && code >= 51 && code <= 67;
-  const isSnow = code !== undefined && code >= 71 && code <= 77;
-  const isStorm = code !== undefined && code >= 95;
-  const color = isClear ? (isDay ? "text-amber-300" : "text-sky-200") : isStorm ? "text-indigo-300" : isRain ? "text-sky-300" : isSnow ? "text-white" : "text-gray-300";
-  return (
-    <svg aria-hidden="true" viewBox="0 0 48 48" className={`${className} shrink-0 ${color}`} fill="none" stroke="currentColor" strokeWidth="2">
-      {isClear ? isDay ? <><circle cx="24" cy="24" r="8" fill="currentColor" stroke="none" />{[0,45,90,135].map((angle) => <path key={angle} d="M24 4v6M24 38v6M4 24h6M38 24h6" transform={`rotate(${angle} 24 24)`} />)}</> : <path d="M31 7a17 17 0 1 0 10 31A17 17 0 0 1 31 7Z" fill="currentColor" stroke="none" /> : isStorm ? <path d="M25 7 14 27h10l-3 14 13-21H24l1-13Z" fill="currentColor" stroke="none" /> : isSnow ? <path d="M24 8v32M10 16l28 16M10 32l28-16M24 8l-3 5m3-5 3 5M24 40l-3-5m3 5 3-5" /> : <><path d="M13 33h23a8 8 0 0 0 0-16 11 11 0 0 0-21-2 8 8 0 0 0-2 18Z" fill="currentColor" fillOpacity=".18" />{isRain && <path d="m18 37-2 5m9-5-2 5m9-5-2 5" />}</>}
-    </svg>
-  );
-}
-
 function PianoVideoQuadrant({ latestVideo }: { latestVideo: LatestVideo | null }) {
   return (
     <div className="col-span-2 flex w-full min-w-0 flex-col self-start lg:col-span-2">
@@ -761,23 +666,19 @@ function BeyondSection({ githubActivity, leetcodeActivity, latestVideo }: { gith
 export default function HomeClient({ initialViews, githubActivity, leetcodeActivity, latestVideo }: { initialViews: number; githubActivity: GithubActivity; leetcodeActivity: LeetcodeActivity; latestVideo: LatestVideo | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const siteViews = initialViews;
-  const weather = useWeather();
 
-  // Experience and Beyond are being held back while the new page layout gets nailed down —
-  // flip this back on to bring them back rather than re-deriving the sections/JSX by hand.
+  // Experience's real content and Beyond entirely are being held back while the new page
+  // layout gets nailed down — flip this back on to bring them back rather than re-deriving
+  // the sections/JSX by hand. Experience itself shows as an empty placeholder in the
+  // meantime, just to see section spacing/rhythm with more than two sections in place.
   const SHOW_LATER_SECTIONS = false;
 
-  const sections = SHOW_LATER_SECTIONS
-    ? [
-        { id: "about", label: "About" },
-        { id: "projects", label: "Projects" },
-        { id: "experience", label: "Experience" },
-        { id: "beyond", label: "Beyond" },
-      ]
-    : [
-        { id: "about", label: "About" },
-        { id: "projects", label: "Projects" },
-      ];
+  const sections = [
+    { id: "about", label: "About" },
+    { id: "projects", label: "Projects" },
+    { id: "experience", label: "Experience" },
+    ...(SHOW_LATER_SECTIONS ? [{ id: "beyond", label: "Beyond" }] : []),
+  ];
 
   // Scroll manually so the section anchor never ends up in the address bar.
   const scrollToSection = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -842,27 +743,18 @@ export default function HomeClient({ initialViews, githubActivity, leetcodeActiv
             id="about"
             className={`relative flex scroll-mt-20 items-start pt-24 md:pt-28 lg:min-h-screen lg:items-center lg:pb-0 lg:pt-0 ${SECTION_SPACING} ${CONTAINER}`}
           >
-            <div className="relative grid w-full grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-3">
-              <div className="w-full max-w-xl text-left lg:w-auto">
-                <h1 className="whitespace-nowrap text-4xl font-semibold tracking-[-0.05em] text-white md:text-5xl xl:text-6xl">
-                  Hi, I&rsquo;m Daniel
-                </h1>
-
-                <div className="mt-3 flex items-center gap-1.5 text-xs text-gray-400">
-                  <WeatherIcon code={weather.data?.code} isDay={weather.data?.isDay ?? true} className="h-4 w-4" />
-                  <span>
-                    {weather.loading
-                      ? "Loading weather…"
-                      : weather.error || !weather.data
-                      ? "Weather unavailable"
-                      : `Birmingham, AL · ${Math.round(weather.data.temperature)}°F, ${weatherCondition(weather.data.code).toLowerCase()}`}
-                  </span>
+            <div className="w-full max-w-2xl text-left">
+                <div className="flex items-center gap-4">
+                  <Avatar />
+                  <h1 className="text-4xl font-semibold tracking-[-0.05em] text-white md:text-5xl xl:text-6xl">
+                    Daniel Coyle
+                  </h1>
                 </div>
 
-                <p className="mt-3 max-w-lg text-base font-normal leading-relaxed text-gray-200 md:text-[1.05rem]">
+                <p className="mt-4 text-base font-normal leading-relaxed text-gray-200 md:text-[1.05rem]">
                   Recent Computer Science graduate from UC Irvine, now instructing at Coding
                   Mind and building side projects while chasing software engineering / data
-                  engineering roles.
+                  engineering roles. Based in Birmingham, Alabama.
                 </p>
                 <p className="mt-1.5 text-xs italic text-gray-500">— placeholder bio, replace with your own copy</p>
 
@@ -923,9 +815,6 @@ export default function HomeClient({ initialViews, githubActivity, leetcodeActiv
                     />
                   </a>
                 </div>
-              </div>
-
-              <PhotoStack />
             </div>
 
           </section>
@@ -939,7 +828,7 @@ export default function HomeClient({ initialViews, githubActivity, leetcodeActiv
             </div>
           </section>
 
-          {SHOW_LATER_SECTIONS && (
+          {SHOW_LATER_SECTIONS ? (
             <>
               {/* ── Experience Section ── */}
               <section
@@ -952,6 +841,17 @@ export default function HomeClient({ initialViews, githubActivity, leetcodeActiv
 
               <BeyondSection githubActivity={githubActivity} leetcodeActivity={leetcodeActivity} latestVideo={latestVideo} />
             </>
+          ) : (
+            /* Placeholder only — just to see section spacing/rhythm, no real content yet */
+            <section
+              id="experience"
+              className={`relative flex scroll-mt-20 items-center border-t border-subtle pt-16 lg:min-h-screen ${SECTION_SPACING} ${CONTAINER}`}
+            >
+              <div className="w-full">
+                <p className="text-[10px] uppercase tracking-[0.18em] text-gray-500">Experience</p>
+                <p className="mt-3 text-sm italic text-gray-600">— placeholder, timeline design comes later</p>
+              </div>
+            </section>
           )}
         </main>
         <footer className={`${CONTAINER} mb-4`}>

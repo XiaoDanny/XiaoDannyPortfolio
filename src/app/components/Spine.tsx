@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 export interface SpineSection {
   id: string;
@@ -10,10 +10,12 @@ export interface SpineSection {
 // viewport top — matches how a reader would describe "I'm on this section now".
 const ACTIVE_OFFSET = 160;
 
-/** Desktop-only fixed nav: a compact node cluster with a fill that tracks page scroll progress. */
+/** Desktop-only fixed nav: a compact node cluster, exactly one node lit for the current section. */
 export default function Spine({ sections }: { sections: SpineSection[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [lineInset, setLineInset] = useState({ top: 0, bottom: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const tickingRef = useRef(false);
 
   useEffect(() => {
@@ -21,7 +23,6 @@ export default function Spine({ sections }: { sections: SpineSection[] }) {
       tickingRef.current = false;
 
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0);
 
       // Scrolled to (or past) the bottom always counts as reaching the last section, even if
       // that section plus the footer is too short for its own top to cross ACTIVE_OFFSET.
@@ -53,39 +54,59 @@ export default function Spine({ sections }: { sections: SpineSection[] }) {
     };
   }, [sections]);
 
+  // Measures the first/last dot's actual center so the connector line starts and ends exactly
+  // on them — no guessed inset that could overshoot or fall short.
+  useLayoutEffect(() => {
+    function measure() {
+      const container = containerRef.current;
+      const firstDot = dotRefs.current[0];
+      const lastDot = dotRefs.current[sections.length - 1];
+      if (!container || !firstDot || !lastDot) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const firstRect = firstDot.getBoundingClientRect();
+      const lastRect = lastDot.getBoundingClientRect();
+      setLineInset({
+        top: firstRect.top + firstRect.height / 2 - containerRect.top,
+        bottom: containerRect.bottom - (lastRect.top + lastRect.height / 2),
+      });
+    }
+
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [sections]);
+
   function goTo(event: React.MouseEvent, id: string) {
     event.preventDefault();
     const target = document.getElementById(id);
     if (!target) return;
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+    target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "center" });
   }
 
   return (
     <nav
       aria-label="Section navigation"
-      // Content (Container.tsx) centers independently at `50% - 32rem` (half of its own
-      // max-w-5xl). This sits a small, fixed gap to the left of that same edge, floored so
-      // it can't go off-screen (or collide with content) at the narrow end of the lg
-      // breakpoint (~1024px). w-24 comfortably fits the current labels (measured: "Projects"
-      // is the widest at ~70px) — widen this if longer labels come back later.
-      className="fixed left-[max(1rem,calc(50%-40rem))] top-1/2 z-[9999] hidden w-24 -translate-y-1/2 lg:block"
+      // Right edge sits at the page's literal one-third mark (content, in Container.tsx,
+      // starts just after that same mark). w-24 comfortably fits the current labels
+      // (measured: "Projects" is the widest at ~70px) — widen this if longer labels return.
+      className="fixed left-[calc(33.333%-6rem)] top-1/2 z-[9999] hidden w-24 -translate-y-1/2 lg:block"
     >
-      <div className="relative flex w-full flex-col gap-8">
-        <div className="pointer-events-none absolute right-[5px] top-1.5 bottom-1.5 w-px bg-white/15" />
+      <div ref={containerRef} className="relative flex w-full flex-col gap-8">
         <div
-          className="pointer-events-none absolute right-[5px] top-1.5 w-px bg-white/80 transition-[height] duration-150 ease-out"
-          style={{ height: `calc(${progress * 100}% - 12px)` }}
+          className="pointer-events-none absolute right-[5px] w-px bg-white/15"
+          style={{ top: `${lineInset.top}px`, bottom: `${lineInset.bottom}px` }}
         />
         {sections.map((section, index) => {
-          const isActive = index <= activeIndex;
+          const isActive = index === activeIndex;
           return (
             <a
               key={section.id}
               href={`#${section.id}`}
               onClick={(event) => goTo(event, section.id)}
-              aria-current={index === activeIndex ? "true" : undefined}
-              className="group relative flex w-full items-center justify-end gap-3 focus-visible:outline-none"
+              aria-current={isActive ? "true" : undefined}
+              className="group relative flex w-full items-center justify-end gap-3 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
             >
               <span
                 className={`text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors ${
@@ -95,7 +116,10 @@ export default function Spine({ sections }: { sections: SpineSection[] }) {
                 {section.label}
               </span>
               <span
-                className={`h-[10px] w-[10px] shrink-0 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+                ref={(el) => {
+                  dotRefs.current[index] = el;
+                }}
+                className={`h-[10px] w-[10px] shrink-0 rounded-full border transition-colors ${
                   isActive
                     ? "border-white bg-white"
                     : "border-white/30 bg-transparent group-hover:border-white/60"
