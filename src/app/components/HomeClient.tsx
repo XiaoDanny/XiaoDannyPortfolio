@@ -23,7 +23,7 @@ type Theme = "dark" | "light";
 // that section's toggle to the view it's named for, so landing there shows the right thing.
 // Nav links only scroll — they never touch the Projects/Work-Education toggle state.
 // That only ever gets its starting value once, on page load; after that it's entirely
-// under the visitor's own control via the pill controls themselves.
+// under the visitor's own control via the toggle itself.
 const NAV_LINKS: { label: string; id: string }[] = [
   { label: "About", id: "about" },
   { label: "Featured", id: "featured-project" },
@@ -272,22 +272,6 @@ function LinkedInIcon() {
   );
 }
 
-function YoutubeIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-current">
-      <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z" />
-    </svg>
-  );
-}
-
-function TwitchIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-current">
-      <path d="M4 2h18v13l-5 5h-4l-3 3v-3H4V2Zm2 2v14h4v1.2l1.2-1.2h4l3.8-3.8V4H6Zm3 3h2v5H9V7Zm4 0h2v5h-2V7Z" />
-    </svg>
-  );
-}
-
 function MailIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="1.8">
@@ -305,13 +289,6 @@ function EyeIcon() {
     </svg>
   );
 }
-
-// GitHub/LinkedIn moved up to the About button row (with Resume/Mail) — footer keeps only
-// the two that don't already live elsewhere on the page.
-const SOCIAL_LINKS = [
-  { label: "YouTube", href: "https://www.youtube.com/@XiaoDannyPiani", icon: YoutubeIcon },
-  { label: "Twitch", href: "https://www.twitch.tv/xiaodannylol", icon: TwitchIcon },
-];
 
 function LeetcodeIcon() {
   return (
@@ -654,8 +631,8 @@ const projects = [
     name: "Alpha Ring",
     date: "July 2026 - Present",
     description:
-      "An open source mod that restores local split-screen co-op to Halo: The Master Chief Collection on PC, used by thousands of players. As part of a two-person team, I reverse-engineer the closed-source game engine and hook into it at runtime to add features and fix stability issues.",
-    technologies: ["C++", "CMake"],
+      "An open source mod restoring local split-screen co-op to Halo: The Master Chief Collection on PC. As part of a two-person team, I contribute by decompiling the source code and designing/implementing hooks to enable features the original game didn't support.",
+    technologies: ["C++", "CMake", "Ghidra", "x64dbg", "MinHook"],
     image: "/Images/Projects/AlphaRing.png",
     demoUrl: "https://www.youtube.com/watch?v=IRZPdAJFkc8",
     githubUrl: "https://github.com/megabitt01/AlphaRing/tree/xiaodanny",
@@ -703,7 +680,7 @@ function FeaturedProjectCard() {
   const project = projects[0];
 
   return (
-    <article className="w-full overflow-hidden rounded-[28px] border border-[var(--border-strong)] bg-[var(--card)]">
+    <article className="w-full overflow-hidden rounded-[28px] border border-[var(--border-strong)]">
       <div className="relative aspect-[25/12] w-full bg-[var(--card)]">
         {project.image && (
           <NextImage src={project.image} alt={`${project.name} screenshot`} fill sizes="(max-width: 640px) 100vw, 672px" className="h-full w-full object-cover object-center" />
@@ -723,7 +700,7 @@ function FeaturedProjectCard() {
             href={project.demoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-full bg-[var(--fg)] px-5 py-2 text-xs font-medium uppercase tracking-widest text-[var(--bg)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fg)]"
+            className="rounded-md bg-[var(--fg)] px-5 py-2 text-xs font-medium uppercase tracking-widest text-[var(--bg)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fg)]"
           >
             Demo
           </a>
@@ -732,7 +709,7 @@ function FeaturedProjectCard() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`View ${project.name} on GitHub`}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-strong)] text-[var(--fg)] transition-colors hover:bg-[var(--fg)] hover:text-[var(--bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fg)]"
+            className="flex h-9 w-9 items-center justify-center rounded-md border border-[var(--border-strong)] text-[var(--fg)] transition-colors hover:bg-[var(--fg)] hover:text-[var(--bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fg)]"
           >
             <GithubIcon />
           </a>
@@ -756,7 +733,7 @@ function ProjectRow({ project }: { project: (typeof projects)[number] }) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`View ${project.name} on GitHub`}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] text-[var(--fg)] transition-colors hover:bg-[var(--fg)] hover:text-[var(--bg)]"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[var(--border-strong)] text-[var(--fg)] transition-colors hover:bg-[var(--fg)] hover:text-[var(--bg)]"
           >
             <GithubIcon />
           </a>
@@ -765,7 +742,7 @@ function ProjectRow({ project }: { project: (typeof projects)[number] }) {
       <p className="mt-2 text-sm text-[var(--muted)]">{project.description}</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {project.technologies.map((tech) => (
-          <span key={tech} className="rounded-full border border-[var(--border)] px-2 py-0.5 text-xs text-[var(--muted)]">
+          <span key={tech} className="rounded-md border border-[var(--border)] px-2 py-0.5 text-xs text-[var(--muted)]">
             {tech}
           </span>
         ))}
@@ -839,18 +816,22 @@ function ProjectsSection({ view, onViewChange }: { view: ProjectsView; onViewCha
 
       <Connector />
 
-      {/* Segmented pill toggle instead of a title + separate "Swap" link — this control is
-          both the header and the switch. Experience (Work/Education) on the left, Projects
-          on the right, defaulting to Experience. Its own scroll target, separate from
-          Featured above, so the "Experience" nav link lands here instead of at Featured. */}
-      <div id="experience-toggle" className="mb-6 flex scroll-mt-24 rounded-full border border-[var(--border-strong)] bg-[var(--card)] p-1">
+      {/* Segmented toggle instead of a title + separate "Swap" link — this control is both
+          the header and the switch. Experience (Work/Education) on the left, Projects on
+          the right, defaulting to Experience. Its own scroll target, separate from Featured
+          above, so the "Experience" nav link lands here instead of at Featured. rounded-2xl
+          throughout (not rounded-full) to match the ProjectRow/ExperienceList cards it
+          switches between — a pill capsule here read as a shape the rest of the page's
+          boxes don't use. Inner highlight is rounded-xl (2xl minus the p-1 inset) so it
+          stays concentric with the outer corner instead of the two radii fighting. */}
+      <div id="experience-toggle" className="mb-6 flex scroll-mt-24 rounded-2xl border border-[var(--border-strong)] bg-[var(--card)] p-1">
         {(["experience", "projects"] as const).map((option) => (
           <button
             key={option}
             type="button"
             onClick={() => onViewChange(option)}
             aria-pressed={view === option}
-            className={`flex-1 rounded-full py-2 text-sm font-semibold transition-colors ${
+            className={`flex-1 rounded-xl py-2 text-sm font-semibold transition-colors ${
               view === option ? "bg-[var(--card-3)] text-[var(--fg)]" : "text-[var(--muted-2)] hover:text-[var(--fg)]"
             }`}
           >
@@ -1101,6 +1082,14 @@ export default function HomeClient({
   const [menuOpen, setMenuOpen] = useState(false);
   const [projectsView, setProjectsView] = useState<ProjectsView>("experience");
 
+  // The theme vars below are scoped to [data-theme], set on the content div — but the
+  // page's own scrollbar belongs to <html>, outside that div, so it can't see them.
+  // Mirroring the attribute onto the root lets html::-webkit-scrollbar-* below resolve
+  // the same --muted-2/--muted vars instead of needing a second, hardcoded color set.
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
   function jumpTo(id: string) {
     // "About" is the top of the page — go there directly rather than through
     // scrollIntoView, which is what every other nav link uses.
@@ -1146,6 +1135,41 @@ export default function HomeClient({
           --dot-active: rgba(0, 0, 0, 0.65);
           --dot-inactive: rgba(0, 0, 0, 0.18);
           --dot-hover: rgba(0, 0, 0, 0.35);
+        }
+
+        /* Thin, theme-aware scrollbar instead of the OS default. html carries the mirrored
+           data-theme attribute (see the useEffect above) so --muted-2/--muted resolve here
+           the same as everywhere else on the page — no separate color set to keep in sync.
+           body inherits those same vars from html, and is targeted too because globals.css
+           sets overflow-x: hidden on body, which in some browsers makes body — not html —
+           the element that actually owns the viewport's scrollbar. */
+        html,
+        body {
+          scrollbar-width: thin;
+          scrollbar-color: var(--muted-2) transparent;
+        }
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+          width: 8px;
+        }
+        html::-webkit-scrollbar-track,
+        body::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        html::-webkit-scrollbar-thumb,
+        body::-webkit-scrollbar-thumb {
+          background-color: var(--muted-2);
+          border-radius: 9999px;
+        }
+        html::-webkit-scrollbar-thumb:hover,
+        body::-webkit-scrollbar-thumb:hover {
+          background-color: var(--muted);
+        }
+        html::-webkit-scrollbar-button,
+        body::-webkit-scrollbar-button {
+          display: none;
+          width: 0;
+          height: 0;
         }
       `}</style>
 
@@ -1236,10 +1260,7 @@ export default function HomeClient({
                 instructor at <span className="font-semibold text-[var(--fg)]">Coding Mind Academy</span>,
                 where I teach data structures, algorithms, and Python. I also contribute to{" "}
                 <span className="font-semibold text-[var(--fg)]">Alpha Ring</span>, an open source
-                mod restoring local split-screen co-op to Halo: The Master Chief Collection on PC
-                for thousands of users to enjoy. I&apos;m currently decompiling the source code to
-                design and implement hooks enabling split-screen features the original Halo games
-                never supported.
+                mod used by thousands of players.
               </p>
               <p className="mt-4 text-[var(--muted)]">
                 I&apos;m seeking software engineering opportunities where I can bring that same
@@ -1248,7 +1269,7 @@ export default function HomeClient({
 
               {/* Right after the pitch — the natural next action once someone's read it.
                   Mail/LinkedIn/GitHub live here now instead of the footer, matching the
-                  deployed site's own pattern; footer keeps just YouTube/Twitch. */}
+                  deployed site's own pattern; footer keeps just copyright + view count. */}
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <a
                   href="/resume.pdf"
@@ -1325,8 +1346,8 @@ export default function HomeClient({
 
       {/* Footer is a sibling of the flex-1 content column above, not nested inside it — that's
           what lets it sit at the bottom of the viewport on short pages instead of floating
-          wherever the content happens to end. Rounded bar, copyright left, stats + social
-          icons right, matching the existing site footer. */}
+          wherever the content happens to end. Rounded bar, copyright left, view count right,
+          matching the existing site footer. */}
       {/* max-w-2xl matches the CONTENT COLUMN's outer edge, but the visible cards
           (Experience, Projects, the activity widget) are narrower than that — they sit
           inside its px-6 padding, so their real box is 624px, not 672px. Footer is a
@@ -1334,27 +1355,10 @@ export default function HomeClient({
           cards means matching 624px directly, not max-w-2xl. */}
       <footer className="mx-auto mb-6 mt-14 flex w-full max-w-[39rem] flex-col items-center gap-4 rounded-2xl border border-[var(--border)] px-6 py-5 text-center sm:flex-row sm:justify-between sm:text-left">
         <p className="text-sm text-[var(--muted)]">© 2026 Daniel Coyle</p>
-        <div className="flex items-center gap-4 text-[var(--muted)]">
-          <span className="inline-flex items-center gap-1.5 text-sm">
-            <EyeIcon />
-            {initialViews.toLocaleString()} views
-          </span>
-          <div className="flex items-center gap-3">
-            {SOCIAL_LINKS.map(({ label, href, icon: Icon }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                title={label}
-                className="text-[var(--muted)] transition-colors hover:text-[var(--fg)]"
-              >
-                <Icon />
-              </a>
-            ))}
-          </div>
-        </div>
+        <span className="inline-flex items-center gap-1.5 text-sm text-[var(--muted)]">
+          <EyeIcon />
+          {initialViews.toLocaleString()} views
+        </span>
       </footer>
     </div>
   );
