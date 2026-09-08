@@ -1250,17 +1250,18 @@ export default function HomeClient({
             <div className="min-w-0 sm:max-w-sm">
               <h1 className="text-4xl font-bold text-[var(--fg)]">Hi, I&apos;m Daniel</h1>
               <p className="mt-4 text-[var(--muted)]">
-                I enjoy reverse-engineering old games, pushing their engines past original limits
-                to unlock features they were never intended to support.
+                I enjoy reverse-engineering old games, pushing their engines beyond their original
+                limits to unlock features they were never intended to support.
               </p>
               <p className="mt-4 text-[var(--muted)]">
                 Since graduating from UC Irvine, where I studied computer science, I&apos;ve worked
                 as an AI QA contractor at <span className="font-semibold text-[var(--fg)]">Handshake</span>,
                 annotating image data to support frontier AI model training. I&apos;m now an
                 instructor at <span className="font-semibold text-[var(--fg)]">Coding Mind Academy</span>,
-                where I teach data structures, algorithms, and Python. I also contribute to{" "}
+                where I teach data structures, algorithms, and Python. I&apos;m also one of two
+                developers on{" "}
                 <span className="font-semibold text-[var(--fg)]">Alpha Ring</span>, an open source
-                mod used by thousands of players.
+                mod with thousands of users.
               </p>
               <p className="mt-4 text-[var(--muted)]">
                 I&apos;m seeking software engineering opportunities where I can bring that same
