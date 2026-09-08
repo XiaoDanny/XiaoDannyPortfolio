@@ -73,29 +73,88 @@ async function githubFetch(url: string) {
   return response.json();
 }
 
-type SearchCommitItem = {
-  sha: string;
-  commit: { message: string };
-  repository: { full_name: string; html_url: string };
+type PushEventPayload = { before?: string; head?: string };
+type PullRequestEventPayload = { action?: string; pull_request?: { head?: { sha?: string } } };
+type ActivityEvent = {
+  type: string;
+  repo: { name: string };
+  payload?: PushEventPayload & PullRequestEventPayload;
+  created_at: string;
 };
+const ZERO_SHA = "0000000000000000000000000000000000000000";
 
+// The commit search API (q=author:) silently excludes forked repos from its index, which dropped
+// commits pushed to forks (e.g. modding tool contributions) entirely. The events API doesn't have
+// that gap, so we reconstruct the recent-commits feed from it instead — but it has two quirks of
+// its own: (1) GitHub omits the PushEvent entirely for a push that opens or updates a pull request,
+// emitting only a PullRequestEvent (opened/synchronize) for it, so both event types are read here;
+// (2) events aren't reliably returned in created_at order, so we sort explicitly rather than trust
+// array order. GitHub also no longer includes a commit list in the PushEvent payload itself (just
+// before/head SHAs), so plain pushes are diffed via the compare endpoint to recover their commits.
+// /events/public (not /events) is used deliberately so a token scoped to this account never
+// surfaces private repo activity.
 async function getRecentCommits(): Promise<CommitEntry[]> {
-  const search = await githubFetch(
-    `https://api.github.com/search/commits?q=author:${GITHUB_USER}&sort=author-date&order=desc&per_page=${COMMIT_COUNT}`,
-  ) as { items: SearchCommitItem[] };
+  const events = await githubFetch(`https://api.github.com/users/${GITHUB_USER}/events/public?per_page=100`) as ActivityEvent[];
+
+  const relevant = events
+    .filter(
+      (event) =>
+        event.type === "PushEvent" ||
+        (event.type === "PullRequestEvent" && (event.payload?.action === "opened" || event.payload?.action === "synchronize")),
+    )
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+  const seen = new Set<string>();
+  const candidates: { sha: string; repoFullName: string }[] = [];
+
+  const addCandidate = (sha: string, repoFullName: string) => {
+    const key = `${repoFullName}#${sha}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    candidates.push({ sha, repoFullName });
+  };
+
+  for (const event of relevant) {
+    if (candidates.length >= COMMIT_COUNT) break;
+
+    if (event.type === "PullRequestEvent") {
+      // event.actor is always GITHUB_USER here (this is their own events feed), so the PR's
+      // head commit is theirs regardless of which repo owns the PR.
+      const sha = event.payload?.pull_request?.head?.sha;
+      if (!sha) continue;
+      addCandidate(sha, event.repo.name);
+      continue;
+    }
+
+    const { before, head } = event.payload ?? {};
+    if (!before || !head || before === ZERO_SHA) continue;
+
+    const repoFullName = event.repo.name;
+    const compare = await githubFetch(`https://api.github.com/repos/${repoFullName}/compare/${before}...${head}`).catch(() => null) as
+      | { commits: { sha: string }[] }
+      | null;
+    if (!compare) continue;
+
+    // Compare returns commits oldest-first; reverse so the newest commit in this push is seen first.
+    for (const commit of [...compare.commits].reverse()) {
+      addCandidate(commit.sha, repoFullName);
+      if (candidates.length >= COMMIT_COUNT) break;
+    }
+  }
 
   const commits = await Promise.all(
-    search.items.map(async (item): Promise<CommitEntry> => {
-      const detail = await githubFetch(`https://api.github.com/repos/${item.repository.full_name}/commits/${item.sha}`) as {
+    candidates.map(async (item): Promise<CommitEntry> => {
+      const detail = await githubFetch(`https://api.github.com/repos/${item.repoFullName}/commits/${item.sha}`) as {
+        commit: { message: string };
         stats?: { additions: number; deletions: number };
       };
       return {
         hash: item.sha.slice(0, 7),
-        message: item.commit.message.split("\n")[0],
+        message: detail.commit.message.split("\n")[0],
         additions: detail.stats?.additions ?? 0,
         deletions: detail.stats?.deletions ?? 0,
-        repoName: item.repository.full_name.split("/")[1],
-        repoUrl: item.repository.html_url,
+        repoName: item.repoFullName.split("/")[1],
+        repoUrl: `https://github.com/${item.repoFullName}`,
       };
     }),
   );
