@@ -1246,7 +1246,7 @@ export default function HomeClient({
         </nav>
 
         <div id="about" className="flex flex-col gap-8">
-          <div className="flex flex-col gap-8 sm:flex-row sm:items-stretch sm:justify-start">
+          <div className="flex flex-col gap-8 sm:flex-row sm:items-stretch sm:justify-between">
             <div className="min-w-0 sm:max-w-sm">
               <h1 className="text-4xl font-bold text-[var(--fg)]">Hi, I&apos;m Daniel</h1>
               <p className="mt-4 text-[var(--muted)]">
