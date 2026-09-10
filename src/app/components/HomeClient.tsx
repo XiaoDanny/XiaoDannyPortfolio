@@ -1318,7 +1318,8 @@ export default function HomeClient({
               <p className="mt-4 text-[var(--muted)]">
                 This October, I&apos;m joining{" "}
                 <span className="font-semibold text-[var(--fg)]">Akamai</span> as a Software
-                Engineer on the Control Plane team.
+                Engineer on the Control Plane team, where I&apos;ll be working on infrastructure
+                behind their Inference Cloud.
               </p>
               <p className="mt-4 text-[var(--muted)]">Always happy to connect, feel free to reach out!</p>
 
