@@ -1319,7 +1319,7 @@ export default function HomeClient({
                 This October, I&apos;m joining{" "}
                 <span className="font-semibold text-[var(--fg)]">Akamai</span> as a Software
                 Engineer on the Control Plane team, where I&apos;ll be working on infrastructure
-                behind their Inference Cloud.
+                behind their AI cloud platform.
               </p>
               <p className="mt-4 text-[var(--muted)]">Always happy to connect, feel free to reach out!</p>
 
