@@ -264,6 +264,14 @@ function GithubIcon() {
   );
 }
 
+function PlayIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6 fill-current">
+      <path d="M8 5v14l11-7Z" />
+    </svg>
+  );
+}
+
 function LinkedInIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-current">
@@ -634,7 +642,7 @@ const projects = [
       "An open source mod restoring local split-screen co-op to Halo: The Master Chief Collection on PC. As part of a two-person team, I contribute by decompiling the source code and designing/implementing hooks to enable features the original game didn't support.",
     technologies: ["C++", "CMake", "Ghidra", "x64dbg", "MinHook"],
     image: "/Images/Projects/AlphaRing.png",
-    demoUrl: "https://www.youtube.com/watch?v=IRZPdAJFkc8",
+    demoUrl: "https://www.youtube.com/watch?v=CNd9i7lv5QE",
     githubUrl: "https://github.com/megabitt01/AlphaRing/tree/xiaodanny",
   },
   {
@@ -671,19 +679,64 @@ const projects = [
   },
 ];
 
+// Matches both youtube.com/watch?v= and youtu.be/ links; returns null for "#" placeholders.
+function getYouTubeVideoId(url: string): string | null {
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
+  return match ? match[1] : null;
+}
+
 // Date/title/description/actions are always visible below the image, not gated behind a
 // hover — reverse-engineering a closed-source game engine to add split-screen back in is
 // the single most interesting fact on this page, and hiding it behind discovery meant even
 // a first-time viewer of their own project card missed it. One card, one border — the image
 // on top and the info below are still a single box, not a box nested inside another.
+//
+// The demo video is the strongest evidence of the project, so it's the card's primary
+// interaction: a thumbnail with a play button that swaps in the real YouTube embed on click,
+// rather than an always-embedded iframe (keeps the page from loading YouTube's player until
+// someone actually wants to watch) or a small "Demo" link off to the side.
 function FeaturedProjectCard() {
   const project = projects[0];
+  const videoId = getYouTubeVideoId(project.demoUrl);
+  const [playing, setPlaying] = useState(false);
 
   return (
     <article className="w-full overflow-hidden rounded-[28px] border border-[var(--border-strong)]">
       <div className="relative aspect-[25/12] w-full bg-[var(--card)]">
-        {project.image && (
-          <NextImage src={project.image} alt={`${project.name} screenshot`} fill sizes="(max-width: 640px) 100vw, 672px" className="h-full w-full object-cover object-center" />
+        {videoId ? (
+          playing ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+              title={`${project.name} demo video`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="h-full w-full"
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setPlaying(true)}
+              aria-label={`Play ${project.name} demo video`}
+              className="group absolute inset-0 h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--fg)]"
+            >
+              <NextImage
+                src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+                alt={`${project.name} demo video thumbnail`}
+                fill
+                sizes="(max-width: 640px) 100vw, 672px"
+                className="h-full w-full object-cover object-center"
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/25 transition-colors group-hover:bg-black/40">
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 text-black shadow-lg transition-transform group-hover:scale-110">
+                  <PlayIcon />
+                </span>
+              </div>
+            </button>
+          )
+        ) : (
+          project.image && (
+            <NextImage src={project.image} alt={`${project.name} screenshot`} fill sizes="(max-width: 640px) 100vw, 672px" className="h-full w-full object-cover object-center" />
+          )
         )}
       </div>
 
@@ -696,14 +749,16 @@ function FeaturedProjectCard() {
         <p className="text-sm leading-relaxed text-[var(--muted)]">{project.description}</p>
 
         <div className="mt-1 flex items-center gap-3">
-          <a
-            href={project.demoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-md bg-[var(--fg)] px-5 py-2 text-xs font-medium uppercase tracking-widest text-[var(--bg)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fg)]"
-          >
-            Demo
-          </a>
+          {!videoId && (
+            <a
+              href={project.demoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-md bg-[var(--fg)] px-5 py-2 text-xs font-medium uppercase tracking-widest text-[var(--bg)] transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fg)]"
+            >
+              Demo
+            </a>
+          )}
           <a
             href={project.githubUrl}
             target="_blank"
