@@ -1309,20 +1309,18 @@ export default function HomeClient({
                 limits to unlock features they were never intended to support.
               </p>
               <p className="mt-4 text-[var(--muted)]">
-                Since graduating from UC Irvine, where I studied computer science, I&apos;ve worked
-                as an AI QA contractor at <span className="font-semibold text-[var(--fg)]">Handshake</span>,
-                evaluating AI-generated image outputs to support frontier AI model training. I&apos;m
-                also one of two developers on{" "}
-                <span className="font-semibold text-[var(--fg)]">Alpha Ring</span>, an open source
-                mod with thousands of users, where I decompile the game&apos;s engine and build
-                runtime hooks to restore features it was never designed to support.
+                Since graduating from UC Irvine, where I studied computer science, I worked as an
+                AI QA at <span className="font-semibold text-[var(--fg)]">Handshake</span> and now
+                contribute to <span className="font-semibold text-[var(--fg)]">Alpha Ring</span>,
+                an open source mod with thousands of users. When I&apos;m not buried in a
+                disassembler, I&apos;m probably at the piano, the gym, or gaming with friends.
               </p>
               <p className="mt-4 text-[var(--muted)]">
                 This October, I&apos;m joining{" "}
                 <span className="font-semibold text-[var(--fg)]">Akamai</span> as a Software
-                Engineer on the Control Plane team, where I&apos;m looking forward to bringing
-                that same problem-solving mindset to production systems.
+                Engineer on the Control Plane team.
               </p>
+              <p className="mt-4 text-[var(--muted)]">Always happy to connect, feel free to reach out!</p>
 
               {/* Right after the pitch — the natural next action once someone's read it.
                   Mail/LinkedIn/GitHub live here now instead of the footer, matching the
