@@ -584,12 +584,12 @@ function ActivityWidget({ github, leetcode, theme }: { github: GithubActivity; l
 // type is unused now (no sub-toggle anymore) but kept in case that comes back.
 const EXPERIENCE = [
   {
-    company: "Coding Mind Academy",
-    role: "Instructor / Tutor",
-    date: "Sep 2026 – Present",
-    description: "Teaching data structures, algorithms, and Python programming to students of mixed ages.",
-    website: "https://codingmind.com/",
-    image: "/Images/Experience/CodingMind.jpg",
+    company: "Akamai",
+    role: "Software Engineer",
+    date: "Oct 2026 – Present",
+    description: "Software Engineer on the Control Plane team for Akamai's Inference Cloud.",
+    website: "https://www.akamai.com/",
+    image: "/Images/Experience/Akamai.png",
     type: "work" as const,
   },
   {
@@ -1311,16 +1311,17 @@ export default function HomeClient({
               <p className="mt-4 text-[var(--muted)]">
                 Since graduating from UC Irvine, where I studied computer science, I&apos;ve worked
                 as an AI QA contractor at <span className="font-semibold text-[var(--fg)]">Handshake</span>,
-                annotating image data to support frontier AI model training. I&apos;m now an
-                instructor at <span className="font-semibold text-[var(--fg)]">Coding Mind Academy</span>,
-                where I teach data structures, algorithms, and Python. I&apos;m also one of two
-                developers on{" "}
+                evaluating AI-generated image outputs to support frontier AI model training. I&apos;m
+                also one of two developers on{" "}
                 <span className="font-semibold text-[var(--fg)]">Alpha Ring</span>, an open source
-                mod with thousands of users.
+                mod with thousands of users, where I decompile the game&apos;s engine and build
+                runtime hooks to restore features it was never designed to support.
               </p>
               <p className="mt-4 text-[var(--muted)]">
-                I&apos;m seeking software engineering opportunities where I can bring that same
-                level of problem solving to production systems.
+                This October, I&apos;m joining{" "}
+                <span className="font-semibold text-[var(--fg)]">Akamai</span> as a Software
+                Engineer on the Control Plane team, where I&apos;m looking forward to bringing
+                that same problem-solving mindset to production systems.
               </p>
 
               {/* Right after the pitch — the natural next action once someone's read it.
