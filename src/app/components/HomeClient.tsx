@@ -701,8 +701,8 @@ function FeaturedProjectCard() {
   const [playing, setPlaying] = useState(false);
 
   return (
-    <article className="w-full overflow-hidden rounded-[28px] border border-[var(--border-strong)]">
-      <div className="relative aspect-[25/12] w-full bg-[var(--card)]">
+    <article className="w-full overflow-hidden">
+      <div className="relative aspect-video w-full bg-[var(--card)]">
         {videoId ? (
           playing ? (
             <iframe
@@ -740,16 +740,27 @@ function FeaturedProjectCard() {
         )}
       </div>
 
-      <div className="flex flex-col gap-3 p-6">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.28em] text-[var(--muted-2)]">{project.date}</p>
-          <h3 className="mt-1 text-2xl font-semibold text-[var(--fg)]">{project.name}</h3>
+      <div className="flex flex-col gap-3 pt-4">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[var(--muted-2)]">{project.date}</p>
+            <h3 className="mt-1 text-2xl font-semibold text-[var(--fg)]">{project.name}</h3>
+          </div>
+          <a
+            href={project.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`View ${project.name} on GitHub`}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-[var(--border-strong)] text-[var(--fg)] transition-colors hover:bg-[var(--fg)] hover:text-[var(--bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fg)]"
+          >
+            <GithubIcon />
+          </a>
         </div>
 
         <p className="text-sm leading-relaxed text-[var(--muted)]">{project.description}</p>
 
-        <div className="mt-1 flex items-center gap-3">
-          {!videoId && (
+        {!videoId && (
+          <div className="mt-1">
             <a
               href={project.demoUrl}
               target="_blank"
@@ -758,17 +769,8 @@ function FeaturedProjectCard() {
             >
               Demo
             </a>
-          )}
-          <a
-            href={project.githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`View ${project.name} on GitHub`}
-            className="flex h-9 w-9 items-center justify-center rounded-md border border-[var(--border-strong)] text-[var(--fg)] transition-colors hover:bg-[var(--fg)] hover:text-[var(--bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fg)]"
-          >
-            <GithubIcon />
-          </a>
-        </div>
+          </div>
+        )}
       </div>
     </article>
   );
@@ -871,35 +873,26 @@ function ProjectsSection({ view, onViewChange }: { view: ProjectsView; onViewCha
 
       <Connector />
 
-      {/* Segmented toggle instead of a title + separate "Swap" link — this control is both
-          the header and the switch. Experience (Work/Education) on the left, Projects on
-          the right, defaulting to Experience. Its own scroll target, separate from Featured
-          above, so the "Experience" nav link lands here instead of at Featured. rounded-2xl
-          throughout (not rounded-full) to match the ProjectRow/ExperienceList cards it
-          switches between — a pill capsule here read as a shape the rest of the page's
-          boxes don't use. Inner highlight is rounded-xl (2xl minus the p-1 inset) so it
-          stays concentric with the outer corner instead of the two radii fighting. */}
-      <div id="experience-toggle" className="mb-6 flex scroll-mt-24 rounded-2xl border border-[var(--border-strong)] bg-[var(--card)] p-1">
-        {(["experience", "projects"] as const).map((option) => (
-          <button
-            key={option}
-            type="button"
-            onClick={() => onViewChange(option)}
-            aria-pressed={view === option}
-            className={`flex-1 rounded-xl py-2 text-sm font-semibold transition-colors ${
-              view === option ? "bg-[var(--card-3)] text-[var(--fg)]" : "text-[var(--muted-2)] hover:text-[var(--fg)]"
-            }`}
-          >
-            {option === "projects" ? "Projects" : "Work/Education"}
-          </button>
-        ))}
+      {/* Plain title + swap link instead of a segmented toggle box — matches the "Featured"
+          label's typography above it, and the title/action-on-the-right pattern the
+          ActivityWidget header uses. Its own scroll target, separate from Featured above,
+          so the "Experience" nav link lands here instead of at Featured. */}
+      <div id="experience-toggle" className="mb-4 flex scroll-mt-24 items-baseline justify-between gap-4 border-b border-[var(--border)] pb-3">
+        <p className="text-lg font-semibold text-[var(--fg)]">{view === "projects" ? "Projects" : "Work/Education"}</p>
+        <button
+          type="button"
+          onClick={() => onViewChange(view === "projects" ? "experience" : "projects")}
+          className="text-sm text-[var(--muted-2)] transition-colors hover:text-[var(--fg)]"
+        >
+          switch to ({view === "projects" ? "Work/Education" : "Projects"})
+        </button>
       </div>
 
       <div style={{ height: contentHeight }} className="overflow-hidden transition-[height] duration-300 ease-[cubic-bezier(.4,0,.2,1)] motion-reduce:transition-none">
         <div ref={contentRef}>
           {view === "projects" ? (
             <div className="flex flex-col gap-4">
-              {projects.map((project) => (
+              {projects.slice(1).map((project) => (
                 <ProjectRow key={project.name} project={project} />
               ))}
             </div>
