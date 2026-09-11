@@ -585,9 +585,9 @@ function ActivityWidget({ github, leetcode, theme }: { github: GithubActivity; l
 const EXPERIENCE = [
   {
     company: "Akamai",
-    role: "Software Engineer",
-    date: "Oct 2026 – Present",
-    description: "Software Engineer on the Control Plane team for Akamai's Inference Cloud.",
+    role: "Incoming Software Engineer",
+    date: "Starting Oct 2026",
+    description: "Joining the Control Plane team for Akamai's Inference Cloud as a Software Engineer.",
     website: "https://www.akamai.com/",
     image: "/Images/Experience/Akamai.png",
     type: "work" as const,
