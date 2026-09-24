@@ -1298,11 +1298,12 @@ export default function HomeClient({
             <div className="min-w-0 sm:max-w-sm">
               <h1 className="text-4xl font-bold text-[var(--fg)]">Hi, I&apos;m Daniel</h1>
               <p className="mt-4 text-[var(--muted)]">
-                I enjoy reverse-engineering old games, pushing their engines beyond their original
+                I&apos;m a <span className="font-semibold text-[var(--fg)]">software engineer</span> who
+                enjoys reverse-engineering old games, pushing their engines beyond their original
                 limits to unlock features they were never intended to support.
               </p>
               <p className="mt-4 text-[var(--muted)]">
-                Since graduating from UC Irvine with a degree in computer science, I&apos;ve worked at{" "}
+                Since graduating from UC Irvine with a degree in computer science, I worked at{" "}
                 <a
                   href="https://joinhandshake.com/blog/our-team/introducing-handshake-ai/"
                   target="_blank"
