@@ -16,10 +16,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://danieljcoyle.com"),
   title: "Daniel Coyle Portfolio",
-  description: "Portfolio — Daniel Coyle (Software Engineer, UCI)",
+  description: "Daniel Coyle's software engineering portfolio.",
   openGraph: {
     title: "Daniel Coyle — Software Engineer",
-    description: "Portfolio — Daniel Coyle (Software Engineer, UCI)",
+    description: "Daniel Coyle's software engineering portfolio.",
     url: "https://danieljcoyle.com",
     siteName: "Daniel Coyle Portfolio",
     type: "website",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Daniel Coyle — Software Engineer",
-    description: "Portfolio — Daniel Coyle (Software Engineer, UCI)",
+    description: "Daniel Coyle's software engineering portfolio.",
   },
 };
 

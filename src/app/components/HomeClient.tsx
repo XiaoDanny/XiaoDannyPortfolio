@@ -702,7 +702,7 @@ function FeaturedProjectCard() {
 
   return (
     <article className="w-full overflow-hidden">
-      <div className="relative aspect-video w-full bg-[var(--card)]">
+      <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-[var(--card)]">
         {videoId ? (
           playing ? (
             <iframe
@@ -1302,19 +1302,47 @@ export default function HomeClient({
                 limits to unlock features they were never intended to support.
               </p>
               <p className="mt-4 text-[var(--muted)]">
-                Since graduating from UC Irvine, where I studied computer science, I worked as an
-                AI QA at <span className="font-semibold text-[var(--fg)]">Handshake</span> and now
-                contribute to <span className="font-semibold text-[var(--fg)]">Alpha Ring</span>,
-                an open source mod with thousands of users. When I&apos;m not buried in a
-                disassembler, I&apos;m probably at the piano, the gym, or gaming with friends.
+                Since graduating from UC Irvine with a degree in computer science, I&apos;ve worked at{" "}
+                <a
+                  href="https://joinhandshake.com/blog/our-team/introducing-handshake-ai/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-[var(--fg)] underline decoration-[var(--border-strong)] underline-offset-4 transition-opacity hover:opacity-70"
+                >
+                  Handshake
+                </a>{" "}
+                as an AI QA, evaluating and improving LLM outputs. I currently contribute to{" "}
+                <a
+                  href="https://github.com/megabitt01/AlphaRing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-[var(--fg)] underline decoration-[var(--border-strong)] underline-offset-4 transition-opacity hover:opacity-70"
+                >
+                  Alpha Ring
+                </a>, an open-source mod used by{" "}
+                <span className="font-semibold text-[var(--fg)]">thousands</span> of players, as one of
+                its core developers.
+              </p>
+              <p className="mt-4 text-[var(--muted)]">
+                When I&apos;m not buried in a disassembler, I&apos;m probably at the piano, the gym, or
+                gaming with friends.
               </p>
               <p className="mt-4 text-[var(--muted)]">
                 This October, I&apos;m joining{" "}
-                <span className="font-semibold text-[var(--fg)]">Akamai</span> as a Software
-                Engineer on the Control Plane team, where I&apos;ll be working on infrastructure
-                behind their AI cloud platform.
+                <a
+                  href="https://www.akamai.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-[var(--fg)] underline decoration-[var(--border-strong)] underline-offset-4 transition-opacity hover:opacity-70"
+                >
+                  Akamai
+                </a>{" "}
+                as a Software Engineer on the Control Plane team, where I&apos;ll be working on
+                infrastructure behind its AI cloud platform.
               </p>
-              <p className="mt-4 text-[var(--muted)]">Always happy to connect, feel free to reach out!</p>
+              <p className="mt-4 text-[var(--muted)]">
+                Always happy to connect. Feel free to reach out!
+              </p>
 
               {/* Right after the pitch — the natural next action once someone's read it.
                   Mail/LinkedIn/GitHub live here now instead of the footer, matching the
