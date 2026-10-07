@@ -1117,15 +1117,28 @@ function CloseIcon() {
   );
 }
 
+// One registration per page load, shared across Strict Mode's double mount and any remount.
+// This only saves a redundant request: /api/views is what actually decides whether it counts.
+let viewRegistration: Promise<number | null> | null = null;
+
+function registerView() {
+  viewRegistration ??= fetch("/api/views", { method: "POST" })
+    .then((response) => (response.ok ? response.json() : null))
+    .then((result: { views?: unknown } | null) => (typeof result?.views === "number" ? result.views : null))
+    .catch(() => null);
+  return viewRegistration;
+}
+
 export default function HomeClient({
   initialViews,
   githubActivity,
   leetcodeActivity,
 }: {
-  initialViews: number;
+  initialViews: number | null;
   githubActivity: GithubActivity;
   leetcodeActivity: LeetcodeActivity;
 }) {
+  const [views, setViews] = useState(initialViews);
   const [theme, setTheme] = useState<Theme>("dark");
   const [menuOpen, setMenuOpen] = useState(false);
   const [projectsView, setProjectsView] = useState<ProjectsView>("experience");
@@ -1137,6 +1150,19 @@ export default function HomeClient({
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
+
+  // Registers the view once the page has loaded and its JS is running, then shows the server's
+  // count. Browsers driven by automation (Selenium, Puppeteer, Playwright) skip it.
+  useEffect(() => {
+    if (navigator.webdriver) return;
+    let active = true;
+    registerView().then((serverViews) => {
+      if (active && serverViews !== null) setViews(serverViews);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   function jumpTo(id: string) {
     // "About" is the top of the page — go there directly rather than through
@@ -1433,10 +1459,12 @@ export default function HomeClient({
           cards means matching 624px directly, not max-w-2xl. */}
       <footer className="mx-auto mb-6 mt-14 flex w-full max-w-[39rem] flex-col items-center gap-4 rounded-2xl border border-[var(--border)] px-6 py-5 text-center sm:flex-row sm:justify-between sm:text-left">
         <p className="text-sm text-[var(--muted)]">© 2026 Daniel Coyle</p>
-        <span className="inline-flex items-center gap-1.5 text-sm text-[var(--muted)]">
-          <EyeIcon />
-          {initialViews.toLocaleString()} views
-        </span>
+        {views !== null && (
+          <span className="inline-flex items-center gap-1.5 text-sm text-[var(--muted)]">
+            <EyeIcon />
+            {views.toLocaleString()} views
+          </span>
+        )}
       </footer>
     </div>
   );
