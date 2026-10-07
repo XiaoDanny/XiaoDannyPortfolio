@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { redis } from "@/app/lib/redis";
+import { TOTAL_VIEWS_KEY } from "@/app/lib/views";
 
 type VotingSong = { id: number; title: string; votes: number };
 type SentenceRecords = Record<string, number>;
 
 const CLICK_COUNT_KEY = "stats:click_count";
-const TOTAL_VIEWS_KEY = "stats:total_views";
 const TYPERACER_RECORD_KEY = "stats:typeracer_record";
 
 declare global {
@@ -68,10 +68,6 @@ export async function POST(request: Request) {
 
   if (body?.type === "click") {
     await redis.incr(CLICK_COUNT_KEY);
-  }
-
-  if (body?.type === "view") {
-    await redis.incr(TOTAL_VIEWS_KEY);
   }
 
   if (body?.type === "race" && typeof body.sentence === "string" && typeof body.time === "number" && body.time > 0 && body.time < 3600) {
